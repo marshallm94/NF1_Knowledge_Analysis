@@ -1,0 +1,497 @@
+---
+title: "NF1 Thesis Analysis"
+author: "Marshall McQuillen"
+date: "12/10/2018"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+```{r, include=FALSE, eval=TRUE}
+# set global options
+knitr::opts_chunk$set(echo = FALSE,
+                      eval = TRUE)
+```
+
+# Study Aims
+
+1. To assess whether parental knowledge of NF1 is dependent on the child's mode of inheritance of the condition (familial vs de novo mutations)
+
+2. To determine how exposure to genetic counseling affects knowledge of NF1.
+
+```{r test_setup}
+# load packages
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(data.table))
+
+# load data
+grand.data <- read.csv("/Users/marsh/atlas_analytics/clients/emily_solem/nf1_thesis/data/grand_data.csv")
+
+# original significance level
+alpha <- 0.05
+
+# Bonferroni Correction
+adj.alpha <- alpha / 4
+
+# create subsets on whether respondent has seend a genetic counselor
+grand.data$seen_gc <- grand.data$have_you_ever_met_with_a_genetic_counselor.
+seen.gc <- subset(grand.data,
+                  seen_gc == "Yes")
+not.seen.gc <- subset(grand.data,
+                      seen_gc == "No")
+
+# create subsets based on whether the respondent has NF1
+group.a <- subset(grand.data, group_id == "Group A")
+group.b <- subset(grand.data, group_id == "Group B")
+group.c <- subset(grand.data, group_id == "Group C")
+```
+
+## Data Overview & Cleaning
+
+There were a total of 303 responses to the questionare:
+
+* 11 respondents were "Not sure" if they had NF1. These respondents were dropped from the data set since both study aims are contingent upon knowing this information.
+
+* One respondent skipped the question, "Does your child's other parent have NF1?" This respondent was kept since they answered the question, "Do you have NF1?" and their answer to "Does your child's other parent have NF1?" was imputed as "No."
+
+* One respondent skipped the question, "Doe you have NF1?" This respondent was dropped from the data set since both study aims are contingent upon knowing this information.
+
+* 14 respondents do not have NF1 and are "Not sure," if the childs other parent has NF1. These respondents were dropped from the data set since both aims of the thesis are dependent on this information.
+    
+After the above adjustments, the final data set contains 277 observations.
+
+## Testing Methodology
+
+Although there are only two separate study aims, the first will require a total of 3 pairwise statistical tests, comparing the average test scores of the three groups below to one another using Welch's $t$-Test.
+
+* **Group A** - Respondents who do not have NF1 and the child's other parent also does not have NF1.
+
+* **Group B** - Respondents who do not have NF1 and the child's other parent does have NF1.
+
+* **Group C** - Respondents who do have NF1 and the child's other parent does not have NF1.
+
+These three tests, combined with the test for the second study aim, create a total of 4 statistical tests. In order to control the family wise error rate, the original significance level ($\alpha = 0.05$) was adjusted using the Bonferroni Correction, reducing the level of statistical significance to $0.05 / 4 = 0.0125$.
+
+\pagebreak
+
+### Study Aim 1 - Does the mode of inheritance (familial vs de novo mutations) of the child have an effect on parental knowledge of NF1?
+
+#### Test 1
+
+* $H_0:$ Respondents in Group B do not have a different average test score than respondents in Group A.
+
+* $H_a:$ Respondents in Group B have a different average test score than respondents in Group A.
+
+\hfill
+
+```{r}
+# welch's t-test
+test.1.results <- t.test(group.a$score, group.b$score, var.equal = FALSE, alternative = 'two.sided')
+
+test.1.data <- rbind.data.frame(group.a, group.b)
+
+subtitle <- paste("Mean's of each group displayed as vertical lines: Group A =", round(mean(group.a$score), 4), "|", "Group B =", round(mean(group.b$score), 4))
+
+ggplot(test.1.data, aes(score, fill = group_id)) +
+    geom_density(alpha = 0.5) +
+    geom_vline(xintercept = mean(group.a$score), color = '#F8766D') +
+    geom_vline(xintercept = mean(group.b$score), color = '#00BFC4') +
+    theme(legend.position="bottom") +
+    theme(legend.title=element_blank()) +
+    ggtitle("Group A vs. Group B",
+            subtitle = subtitle) +
+    xlab("Test Score") +
+    ylab("Density")
+
+
+print(paste("Test 1 p value =", test.1.results$p.value))
+```
+
+Welch's two-tailed $t$-Test returns the above p value, with which we fail to reject the null hypothesis.
+
+\pagebreak
+
+#### Test 2
+
+* $H_0:$ Respondents in Group A do not have a higher average test score than respondents in Group C.
+
+* $H_a:$ Respondents in Group A have a higher average test score than respondents in Group C.
+
+\hfill
+
+```{r}
+# welch's t-test
+test.2.results <- t.test(group.a$score, group.c$score, var.equal = FALSE, alternative = 'greater')
+
+test.2.data <- rbind.data.frame(group.a, group.c)
+
+subtitle <- paste("Mean's of each group displayed as vertical lines: Group A =", round(mean(group.a$score), 4), "|", "Group C =", round(mean(group.c$score), 4))
+
+ggplot(test.2.data, aes(score, fill = group_id)) +
+    geom_density(alpha = 0.5) +
+    geom_vline(xintercept = mean(group.a$score), color = '#F8766D') +
+    geom_vline(xintercept = mean(group.c$score), color = '#00BFC4') +
+    theme(legend.position="bottom") +
+    theme(legend.title=element_blank()) +
+    ggtitle("Group A vs. Group C",
+            subtitle = subtitle) +
+    xlab("Test Score") +
+    ylab("Density")
+
+print(paste("Test 2 p value =", test.2.results$p.value))
+```
+
+Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
+
+\pagebreak
+
+#### Test 3
+
+* $H_0:$ Respondents in Group B do not have a higher average test score than respondents in Group C.
+
+* $H_a:$ Respondents in Group B have a higher average test score than respondents in Group C.
+
+\hfill
+
+```{r}
+# welch's t-test
+test.3.results <- t.test(group.b$score, group.c$score, var.equal = FALSE, alternative = 'greater')
+
+test.3.data <- rbind.data.frame(group.b, group.c)
+
+subtitle <- paste("Mean's of each group displayed as vertical lines: Group B =", round(mean(group.b$score), 4), "|", "Group C =", round(mean(group.c$score), 4))
+
+ggplot(test.3.data, aes(score, fill = group_id)) +
+    geom_density(alpha = 0.5) +
+    geom_vline(xintercept = mean(group.b$score), color = '#F8766D') +
+    geom_vline(xintercept = mean(group.c$score), color = '#00BFC4') +
+    theme(legend.position="bottom") +
+    theme(legend.title=element_blank()) +
+    ggtitle("Group B vs. Group C",
+            subtitle = subtitle) +
+    xlab("Test Score") +
+    ylab("Density")
+
+print(paste("Test 3 p value =", test.3.results$p.value))
+```
+
+Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
+
+\pagebreak
+
+#### Test 4
+
+* $H_0:$ Respondents who have seen a genetic counselor do not have a higher average test score than those that have not seen a genetic counselor.
+
+* $H_a:$ Respondents who have seen a genetic counselor have a higher average test score than those that have not seen a genetic counselor
+
+\hfill
+
+```{r}
+# welch's t-test
+test.4.results <- t.test(seen.gc$score, not.seen.gc$score, var.equal = FALSE,
+       alternative = 'greater')
+
+
+test.4.data <- rbind.data.frame(seen.gc, not.seen.gc)
+
+subtitle <- paste("Mean's of each group displayed as vertical lines: Yes =", round(mean(seen.gc$score), 4), "|", "No =", round(mean(not.seen.gc$score), 4))
+
+ggplot(test.4.data, aes(score, fill = seen_gc)) +
+    geom_density(alpha = 0.5) +
+    geom_vline(xintercept = mean(seen.gc$score), color = '#F8766D') +
+    geom_vline(xintercept = mean(not.seen.gc$score), color = '#00BFC4') +
+    theme(legend.position="bottom") +
+    theme(legend.title=element_blank()) +
+    ggtitle("Have you seen a Genetic Counselor?",
+            subtitle = subtitle) +
+    xlab("Test Score") +
+    ylab("Density")
+
+print(paste("Test 4 p value =", test.3.results$p.value))
+```
+
+Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
+
+
+### Assumption Testing
+
+```{r}
+#car::qqPlot(group.a$score)
+#car::qqPlot(group.b$score)
+#car::qqPlot(group.c$score)
+#car::qqPlot(seen.gc$score)
+#car::qqPlot(not.seen.gc$score)
+```
+
+
+### Demographic Analysis
+
+```{r proportion_of_respondents_who_have_nf1}
+ggplot(grand.data, aes(do_you_have_nf1., fill = do_you_have_nf1.)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    geom_text(aes(y = ((..count..)/sum(..count..)),
+                  label = scales::percent((..count..)/sum(..count..))),
+              stat = "count",
+              vjust = -0.25) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.position = 'bottom',
+          legend.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("Do you have have NF1?") +
+    ylab("Proportion")
+
+result <- table(grand.data$do_you_have_nf1.)
+knitr::kable(result,
+             caption = "Do you have NF1?",
+             col.names = c('Response','Count'))
+```
+
+\hfill
+
+```{r proportion_of_respondents_who_have_met_a_gc}
+ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
+                       fill = have_you_ever_met_with_a_genetic_counselor.)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    geom_text(aes(y = ((..count..)/sum(..count..)),
+                  label = scales::percent((..count..)/sum(..count..))),
+              stat = "count",
+              vjust = -0.25) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.position = 'bottom',
+          legend.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("Have you ever met with a Genetic Counselor?") +
+    ylab("Proportion")
+
+result <- table(grand.data$have_you_ever_met_with_a_genetic_counselor.)
+knitr::kable(result,
+             caption = "Have you ever met with a Genetic Counselor?",
+             col.names = c('Response','Count'))
+```
+
+\hfill
+
+```{r employment_status}
+grand.data$employment_status <- sub("^$", "Unknown", grand.data$employment_status)
+
+ggplot(grand.data, aes(employment_status,
+                       fill = employment_status)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    geom_text(aes(y = ((..count..)/sum(..count..)),
+                  label = scales::percent((..count..)/sum(..count..))),
+              stat = "count",
+              vjust = -0.25) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.title = element_blank(),
+          legend.position = 'bottom',
+          axis.title.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("Employment Status") +
+    ylab("Proportion")
+
+result <- table(grand.data$employment_status)
+knitr::kable(result,
+             caption = "What is your employment status?",
+             col.names = c('Response','Count'))
+```
+
+\hfill
+
+```{r gender}
+grand.data$gender <- sub("^$", "Unknown", grand.data$gender)
+
+ggplot(grand.data, aes(gender,
+                       fill = gender)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    geom_text(aes(y = ((..count..)/sum(..count..)),
+                  label = scales::percent((..count..)/sum(..count..))),
+              stat = "count",
+              vjust = -0.25) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.title = element_blank(),
+          legend.position = 'bottom',
+          axis.title.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("Gender") +
+    ylab("Proportion")
+
+result <- table(grand.data$gender)
+knitr::kable(result,
+             caption = "Gender",
+             col.names = c('Response','Count'))
+```
+
+\hfill
+
+```{r ethnicity}
+grand.data$ethnicity <- sub("^$", "Unkown", grand.data$ethnicity)
+
+ggplot(grand.data, aes(ethnicity,
+                       fill = ethnicity)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    geom_text(aes(y = ((..count..)/sum(..count..)),
+                  label = scales::percent((..count..)/sum(..count..))),
+              stat = "count",
+              vjust = -0.25) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.title = element_blank(),
+          legend.position = 'bottom',
+          axis.title.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("Ethnicity") +
+    ylab("Proportion")
+
+result <- table(grand.data$ethnicity)
+knitr::kable(result,
+             caption = "Ethnicity",
+             col.names = c('Response \t','Count'))
+```
+
+\hfill
+
+```{r specialists_seen}
+cols = c("does_your_oldest_child_see_a_neurologist_for_nf_care.",
+         "does_your_oldest_child_see_an_oncologist_for_nf_care.",
+         "does_your_oldest_child_see_a_geneticist_for_nf_care.",
+         "does_your_oldest_child_see_an_ent.audiologist_for_nf_care.",
+         "does_your_oldest_child_see_a_pediatrician_for_nf_care.",
+         "does_your_oldest_child_see_a_dermatologist_for_nf_care.",
+         "mode_of_inheritance")
+
+grand.data$mode_of_inheritance <- ifelse(grand.data$does_your_childs_other_parent_have_nf1. == "No" & grand.data$do_you_have_nf1. == "No", "De Novo", "Inherited")
+
+
+display.df <- grand.data %>%
+    group_by(mode_of_inheritance) %>%
+    summarise(Neurologist = sum(does_your_oldest_child_see_a_neurologist_for_nf_care.),
+              Oncologist = sum(does_your_oldest_child_see_an_oncologist_for_nf_care.),
+              Geneticist = sum(does_your_oldest_child_see_a_geneticist_for_nf_care.),
+              Audiologist = sum(does_your_oldest_child_see_an_ent.audiologist_for_nf_care.),
+              Pediatrician = sum(does_your_oldest_child_see_a_pediatrician_for_nf_care.),
+              Dermatologist = sum(does_your_oldest_child_see_a_pediatrician_for_nf_care.)
+              )
+df.d <- melt(display.df, id.vars='mode_of_inheritance')
+
+
+ggplot(df.d, aes(x = variable, y = value, fill = variable)) +
+    geom_bar(stat = 'identity') +
+    facet_grid(~mode_of_inheritance) +
+    geom_text(aes(y = value, label = value),
+              vjust = -0.25,
+              size = 3) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = 'none',
+          axis.title.x = element_blank()) +
+    ggtitle("What specialists does your affected child see?",
+            "Faceted by mode of inheritance") +
+    ylab("Count")
+```
+
+\pagebreak
+
+```{r frequency_of_visits}
+ggplot(grand.data, aes(how_often_does_your_.oldest._child_see_an_nf_doctor.,
+                       fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    geom_text(aes(y = ((..count..)/sum(..count..)),
+                  label = scales::percent((..count..)/sum(..count..))),
+              stat = "count",
+              vjust = -0.25) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.title = element_blank(),
+          legend.position = 'bottom',
+          axis.title.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("How often does your oldest child see a NF1 doctor?") +
+    ylab("Proportion")
+
+result <- table(grand.data$how_often_does_your_.oldest._child_see_an_nf_doctor.)
+knitr::kable(result,
+             caption = "How often does your oldest child see a NF1 doctor?",
+             col.names = c('Response \t','Count'))
+```
+
+\hfill
+
+```{r frequency_of_visits_vs_score}
+display.df <- grand.data %>%
+    group_by(how_often_does_your_.oldest._child_see_an_nf_doctor.) %>%
+    summarise(mean_score = mean(score))
+df.d <- melt(display.df, id.vars='how_often_does_your_.oldest._child_see_an_nf_doctor.')
+
+
+ggplot(df.d, aes(x = how_often_does_your_.oldest._child_see_an_nf_doctor., y = value, fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
+    geom_bar(stat = 'identity') +
+    scale_y_continuous(labels = scales::percent) +
+    geom_text(aes(y = value, label = round(value*100, 2)),
+              vjust = -0.25,
+              size = 3) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = 'none',
+          axis.title.x = element_blank()) +
+    ggtitle("How often does your oldest child see a NF1 doctor?") +
+    ylab("Mean Quiz Score")
+```
+
+\hfill
+
+```{r mode_of_inheritance_vs_seen_gc}
+ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
+                       fill = have_you_ever_met_with_a_genetic_counselor.)) +
+    geom_bar(aes(y = (..count..))) +
+    facet_grid(~mode_of_inheritance) +
+    geom_text(aes(y = (..count..),
+                  label = (..count..)),
+              stat = "count",
+              vjust = -0.25) +
+    theme(legend.title = element_blank(),
+          legend.position = 'bottom',
+          axis.title.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("Have you ever met with a Genetic Counselor?",
+            "Faceted by mode of inheritance") +
+    ylab("Count")
+```
+
+\hfill
+
+```{r severity_symptoms}
+ggplot(grand.data, aes(how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.,
+                       fill = how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    geom_text(aes(y = ((..count..)/sum(..count..)),
+                  label = scales::percent((..count..)/sum(..count..))),
+              stat = "count",
+              vjust = -0.25) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.title = element_blank(),
+          legend.position = 'bottom',
+          axis.title.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("How would you describe the severity of symptoms of your oldest child with NF1?") +
+    ylab("Proportion")
+
+result <- table(grand.data$how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.)
+knitr::kable(result,
+             caption = "How would you describe the severity of symptoms of your oldest child with NF1?",
+             col.names = c('Response \t','Count'))
+```
+
+\hfill
+
+```{r }
+colnames(grand.data)
+
+```

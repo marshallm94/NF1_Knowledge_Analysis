@@ -26,7 +26,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(data.table))
 
 # load data
-grand.data <- read.csv("/Users/marsh/atlas_analytics/clients/emily_solem/nf1_thesis/data/grand_data.csv")
+grand.data <- read.csv("/Users/marshallmcquillen/Data_Science/NF1_Thesis/data/grand_data.csv")
 
 # original significance level
 alpha <- 0.05

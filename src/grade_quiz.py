@@ -75,7 +75,7 @@ def grade_quiz(grand_data_filepath, answer_key_filepath):
         graded_quiz[col] = df[col].copy()
 
     updated_cols.append('score')
-    updated_cols.extend(quiz_columns)    
+    updated_cols.extend(quiz_columns)
     return graded_quiz[updated_cols].copy()
 
 

@@ -128,29 +128,7 @@ def clean_data(filepath, updated_filepath):
          'is_small_head_size_associated_with_nf1?',
          'are_cataracts_associated_with_nf1?']
 
-    obtainKnowledge = ["If you have questions regarding NF1, do you obtain knowledge from your doctor?",
-    "If you have questions regarding NF1, do you obtain knowledge from family members with NF1?",
-    "If you have questions regarding NF1, do you obtain knowledge from online searches?",
-    "If you have questions regarding NF1, do you obtain knowledge from an NF organization website?",
-    "If you have questions regarding NF1, do you obtain knowledge from social media sites (such as Facebook)?",
-    "If you have questions regarding NF1, do you obtain knowledge from other families you know that have NF1?",
-    "Do you not have any questions regarding NF1?",
-    "If you have questions regarding NF1, do you not obtain additional information?",
-    "If you have questions regarding NF1, do you obtain knowledge from other sources? (please specify)"]
-
-    obtainKnowledge = [col.lower().replace(' ','_') for col in obtainKnowledge]
-
-    to_binary_columns.extend(obtainKnowledge)
-
-    # print(df['if_you_have_questions_regarding_nf1,_do_you_obtain_knowledge_from_your_doctor?'].head(50))
-
-    print(df.loc[13,'if_you_have_questions_regarding_nf1,_do_you_obtain_knowledge_from_your_doctor?'])
-
     df = convert_to_binary(df, to_binary_columns)
-
-    print(df.loc[13,'if_you_have_questions_regarding_nf1,_do_you_obtain_knowledge_from_your_doctor?'])
-
-    # print(df['if_you_have_questions_regarding_nf1,_do_you_obtain_knowledge_from_your_doctor?'].head(50))
 
     binary_quiz_questions = ['one_half,_or_50%,_of_genetic_information_is_passed_down_from_mother_to_child.',
          'there_is_more_than_one_gene_that_causes_nf1.',

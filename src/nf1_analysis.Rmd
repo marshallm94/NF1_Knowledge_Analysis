@@ -509,21 +509,11 @@ ggplot(df.d, aes(x = variable, y = value, fill = variable)) +
 \pagebreak
 
 ```{r frequency_of_visits}
-display.df <- data.frame(table(grand.data$mode_of_inheritance, grand.data$how_often_does_your_.oldest._child_see_an_nf_doctor.))
-
-colnames(display.df) <- c('ModeOfInheritance','Frequency','Count')
-
-ggplot(display.df, aes(x = Frequency,
-                       y = Count,
-                       fill = Frequency)) +
-    geom_bar(stat = 'identity') +
-    facet_grid(~ModeOfInheritance) +
-    geom_text(aes(y = Count/tappy(..PANEL..,sum),
-                  label = Count),
-              stat = 'identity',
-              vjust = -0.25)
-    geom_text(aes(y = ((..count..)/sum(..count..)),
-                  label = scales::percent((..count..)/sum(..count..))),
+ggplot(grand.data, aes(how_often_does_your_.oldest._child_see_an_nf_doctor.,
+                       y = (..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))) +
+    geom_bar(aes(fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
+    facet_grid(~mode_of_inheritance) +
+    geom_text(aes(label = round(((..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))*100,2)),
               stat = "count",
               vjust = -0.25) +
     scale_y_continuous(labels = scales::percent) +
@@ -535,10 +525,9 @@ ggplot(display.df, aes(x = Frequency,
     ggtitle("How often does your oldest child see a NF1 doctor?") +
     ylab("Proportion")
 
-result <- table(grand.data$how_often_does_your_.oldest._child_see_an_nf_doctor.)
+result <- table(grand.data$how_often_does_your_.oldest._child_see_an_nf_doctor., grand.data$mode_of_inheritance)
 knitr::kable(result,
-             caption = "How often does your oldest child see a NF1 doctor?",
-             col.names = c('Response \t','Count'))
+             caption = "How often does your oldest child see a NF1 doctor?")
 ```
 
 \hfill

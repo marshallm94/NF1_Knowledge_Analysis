@@ -438,7 +438,38 @@ knitr::kable(result,
              col.names = c('Response \t','Count'))
 ```
 
+\pagebreak
+
+One person did not answer the question regarding their educational background, and therefore was excluded from the below plot.
+
+```{r educational_background}
+display.df <- grand.data[grand.data$educational_background != "", ]
+
+ggplot(display.df, aes(educational_background,
+                       fill = educational_background)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    geom_text(aes(y = ((..count..)/sum(..count..)),
+                  label = scales::percent((..count..)/sum(..count..))),
+              stat = "count",
+              vjust = -0.25) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.title = element_blank(),
+          legend.position = 'bottom',
+          axis.title.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank()) +
+    ggtitle("Educational Background") +
+    ylab("Proportion")
+
+result <- table(display.df$educational_background)
+knitr::kable(result[2:length(result)],
+             caption = "Educational Background",
+             col.names = c('Response \t','Count'))
+```
+
 \hfill
+
+It is important to note that the answers to the below question, "What specialists does your affected child see?" are not mutually exclusive - children who sa a Neurologist may have seen an Oncologist and a Geneticist as well. 
 
 ```{r specialists_seen}
 cols = c("does_your_oldest_child_see_a_neurologist_for_nf_care.",
@@ -478,9 +509,19 @@ ggplot(df.d, aes(x = variable, y = value, fill = variable)) +
 \pagebreak
 
 ```{r frequency_of_visits}
-ggplot(grand.data, aes(how_often_does_your_.oldest._child_see_an_nf_doctor.,
-                       fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
-    geom_bar(aes(y = (..count..)/sum(..count..))) +
+display.df <- data.frame(table(grand.data$mode_of_inheritance, grand.data$how_often_does_your_.oldest._child_see_an_nf_doctor.))
+
+colnames(display.df) <- c('ModeOfInheritance','Frequency','Count')
+
+ggplot(display.df, aes(x = Frequency,
+                       y = Count,
+                       fill = Frequency)) +
+    geom_bar(stat = 'identity') +
+    facet_grid(~ModeOfInheritance) +
+    geom_text(aes(y = Count/tappy(..PANEL..,sum),
+                  label = Count),
+              stat = 'identity',
+              vjust = -0.25)
     geom_text(aes(y = ((..count..)/sum(..count..)),
                   label = scales::percent((..count..)/sum(..count..))),
               stat = "count",

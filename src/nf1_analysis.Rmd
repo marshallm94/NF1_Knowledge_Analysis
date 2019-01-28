@@ -28,8 +28,9 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(ltm))
 
-# load data
+# load & setup data
 grand.data <- read.csv("/Users/marshallmcquillen/Data_Science/NF1_Thesis/data/grand_data.csv")
+grand.data$mode_of_inheritance <- ifelse(grand.data$does_your_childs_other_parent_have_nf1. == "No" & grand.data$do_you_have_nf1. == "No", "De Novo", "Inherited")
 
 # original significance level
 alpha <- 0.05
@@ -61,12 +62,10 @@ There were a total of 303 responses to the questionare:
 * One respondent skipped the question, "Doe you have NF1?" This respondent was dropped from the data set since both study aims are contingent upon knowing this information.
 
 * 14 respondents do not have NF1 and are "Not sure," if the childs other parent has NF1. These respondents were dropped from the data set since both aims of the thesis are dependent on this information.
-    
-After the above adjustments, the final data set contains 277 observations.
 
-\pagebreak
+* Three additional respondents were dropped from the study due to leaving other questions that will be discussed blank.
 
-```{r group_summary}
+```{r group_summary_setup}
 summary.df <- data.frame(Mean = c(mean(group.a$score),
                                   mean(group.b$score),
                                   mean(group.c$score)),
@@ -74,9 +73,15 @@ summary.df <- data.frame(Mean = c(mean(group.a$score),
                                                sd(group.b$score),
                                                sd(group.c$score)))
 rownames(summary.df) <- c('Group A','Group B','Group C')
-knitr::kable(summary.df,
-             caption = "Test Score Statistics")
+
+age.range <- range(grand.data$age, na.rm = TRUE)
+age.mean <- mean(grand.data$age, na.rm = TRUE)
+age.sd <- sd(grand.data$age, na.rm = TRUE)
 ```
+
+\pagebreak
+
+After the above adjustments, the final data set contains 274 respondents, with an age ranging from `r age.range[1]` to `r age.range[2]` and a mean age of `r age.mean`. The standard deviation of the ages is `r age.sd`.
 
 ## Testing Methodology
 
@@ -89,6 +94,13 @@ Although there are only two separate study aims, the first will require a total 
 * **Group C** - Respondents who do have NF1 and the child's other parent does not have NF1.
 
 These three tests, combined with the test for the second study aim, create a total of 4 statistical tests. In order to control the family wise error rate, the original significance level ($\alpha = 0.05$) was adjusted using the Bonferroni Correction, reducing the level of statistical significance to $0.05 / 4 = 0.0125$.
+
+A table with summar statistcs of the three groups is displayed below.
+
+```{r group_summary_table}
+knitr::kable(summary.df,
+             caption = "Test Score Statistics")
+```
 
 \pagebreak
 
@@ -209,7 +221,6 @@ Welch's one-sided $t$-Test returns the above p value. Being well below the Bonfe
 # welch's t-test
 test.4.results <- t.test(seen.gc$score, not.seen.gc$score, var.equal = FALSE,
        alternative = 'greater')
-
 
 test.4.data <- rbind.data.frame(seen.gc, not.seen.gc)
 
@@ -438,9 +449,6 @@ cols = c("does_your_oldest_child_see_a_neurologist_for_nf_care.",
          "does_your_oldest_child_see_a_dermatologist_for_nf_care.",
          "mode_of_inheritance")
 
-grand.data$mode_of_inheritance <- ifelse(grand.data$does_your_childs_other_parent_have_nf1. == "No" & grand.data$do_you_have_nf1. == "No", "De Novo", "Inherited")
-
-
 display.df <- grand.data %>%
     group_by(mode_of_inheritance) %>%
     summarise(Neurologist = sum(does_your_oldest_child_see_a_neurologist_for_nf_care.),
@@ -558,11 +566,4 @@ result <- table(grand.data$how_would_you_describe_the_severity_of_symptoms_of_yo
 knitr::kable(result,
              caption = "How would you describe the severity of symptoms of your oldest child with NF1?",
              col.names = c('Response \t','Count'))
-```
-
-\hfill
-
-```{r }
-colnames(grand.data)
-
 ```

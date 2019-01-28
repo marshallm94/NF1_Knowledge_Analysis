@@ -6,6 +6,7 @@ from collections import Counter
 def grade_quiz(grand_data_filepath, answer_key_filepath):
 
     df = pd.read_csv(grand_data_filepath)
+
     answers = pd.read_csv(answer_key_filepath)
 
     quiz_columns = answers.question.unique()
@@ -38,6 +39,15 @@ def grade_quiz(grand_data_filepath, answer_key_filepath):
     graded_quiz['number_correct'] = graded_quiz.sum(axis=1)
     graded_quiz['total_quiz_questions'] = len(quiz_columns)
     graded_quiz['score'] = graded_quiz.number_correct / graded_quiz.total_quiz_questions
+
+    explanation_columns = ['did_a_doctor_explain_the_medial_aspects_of_nf1_to_you?',
+    'did_a_genetic_counselor_explain_the_medial_aspects_of_nf1_to_you?',
+    'did_a_family_member_explain_the_medial_aspects_of_nf1_to_you?',
+    'did_no_one_explain_the_medial_aspects_of_nf1_to_you?',
+    'are_you_not_sure_who_explained_the_medial_aspects_of_nf1_to_you?']
+
+    for col in explanation_columns:
+        graded_quiz[col] = df[col].copy()
 
     demographic_cols = ['respondent_id',
                         'age',
@@ -75,7 +85,9 @@ def grade_quiz(grand_data_filepath, answer_key_filepath):
         graded_quiz[col] = df[col].copy()
 
     updated_cols.append('score')
+    updated_cols.extend(explanation_columns)
     updated_cols.extend(quiz_columns)
+
     return graded_quiz[updated_cols].copy()
 
 

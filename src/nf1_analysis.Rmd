@@ -297,16 +297,19 @@ cronbachs <- cronbach.alpha(quiz.df)$alpha
 Using 43 quiz questions returned a Cronbach Alpha value of `r cronbachs`.
 
 
-### Assumption Testing
+### Test Limitations
+
+**EXPLANATION OF TEST LIMITATION (MARSHALL NEEDS TO FINISH)**
 
 ```{r}
-#car::qqPlot(group.a$score)
-#car::qqPlot(group.b$score)
-#car::qqPlot(group.c$score)
-#car::qqPlot(seen.gc$score)
-#car::qqPlot(not.seen.gc$score)
+shapiro.test(group.a$score)
+shapiro.test(group.b$score)
+shapiro.test(group.c$score)
+shapiro.test(seen.gc$score)
+shapiro.test(not.seen.gc$score)
 ```
 
+\pagebreak
 
 ### Demographic Analysis
 
@@ -467,9 +470,11 @@ knitr::kable(result[2:length(result)],
              col.names = c('Response \t','Count'))
 ```
 
-\hfill
+\pagebreak
 
-It is important to note that the answers to the below question, "What specialists does your affected child see?" are not mutually exclusive - children who sa a Neurologist may have seen an Oncologist and a Geneticist as well. 
+It is important to note that the answers to the below question, "What specialists does your affected child see?" are not mutually exclusive - children who see a Neurologist may have seen an Oncologist and a Geneticist as well. 
+
+\hfill
 
 ```{r specialists_seen}
 cols = c("does_your_oldest_child_see_a_neurologist_for_nf_care.",
@@ -487,8 +492,7 @@ display.df <- grand.data %>%
               Geneticist = sum(does_your_oldest_child_see_a_geneticist_for_nf_care.),
               Audiologist = sum(does_your_oldest_child_see_an_ent.audiologist_for_nf_care.),
               Pediatrician = sum(does_your_oldest_child_see_a_pediatrician_for_nf_care.),
-              Dermatologist = sum(does_your_oldest_child_see_a_pediatrician_for_nf_care.)
-              )
+              Dermatologist = sum(does_your_oldest_child_see_a_pediatrician_for_nf_care.))
 df.d <- melt(display.df, id.vars='mode_of_inheritance')
 
 
@@ -576,11 +580,12 @@ ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
 \hfill
 
 ```{r severity_symptoms}
-ggplot(grand.data, aes(how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.,
-                       fill = how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.)) +
-    geom_bar(aes(y = (..count..)/sum(..count..))) +
-    geom_text(aes(y = ((..count..)/sum(..count..)),
-                  label = scales::percent((..count..)/sum(..count..))),
+ggplot(grand.data,
+       aes(how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.,
+           y = (..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))) +
+    geom_bar(aes(fill = how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.)) +
+    facet_grid(~mode_of_inheritance) +
+    geom_text(aes(label = round(((..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))*100,2)),
               stat = "count",
               vjust = -0.25) +
     scale_y_continuous(labels = scales::percent) +
@@ -589,11 +594,71 @@ ggplot(grand.data, aes(how_would_you_describe_the_severity_of_symptoms_of_your_.
           axis.title.x = element_blank(),
           axis.ticks.x = element_blank(),
           axis.text.x = element_blank()) +
-    ggtitle("How would you describe the severity of symptoms of your oldest child with NF1?") +
+    ggtitle("How would you describe the severity of symptoms\nof your oldest child with NF1?",
+            "Faceted by mode of inheritance") +
     ylab("Proportion")
 
-result <- table(grand.data$how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.)
+result <- table(grand.data$how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1., grand.data$mode_of_inheritance)
 knitr::kable(result,
-             caption = "How would you describe the severity of symptoms of your oldest child with NF1?",
-             col.names = c('Response \t','Count'))
+             caption = "How would you describe the severity of symptoms of your oldest child with NF1?")
+```
+
+\pagebreak
+
+Similar to one of the previous plots, it is important to note that the answers to the below question, "Where do you obtain knowledge regarding NF1 should you have questions?" are not mutually exclusive - parents who ask their doctor might also reference online sources.
+
+\hfill
+
+```{r obtain_knowledge}
+display.df <- grand.data %>%
+  group_by(mode_of_inheritance) %>%
+  summarize(
+    Doctor = sum(if_you_have_questions_regarding_nf1_do_you_obtain_knowledge_from_your_doctor.),
+    NF1Organization = sum(if_you_have_questions_regarding_nf1_do_you_obtain_knowledge_from_an_nf_organization_website.),
+    FamilyMembers = sum(if_you_have_questions_regarding_nf1_do_you_obtain_knowledge_from_family_members_with_nf1.),
+    OnlineSources = sum(if_you_have_questions_regarding_nf1_do_you_obtain_knowledge_from_online_searches.),
+    SocialMedia = sum(if_you_have_questions_regarding_nf1_do_you_obtain_knowledge_from_social_media_sites_.such_as_facebook..),
+    OtherFamilies = sum(if_you_have_questions_regarding_nf1_do_you_obtain_knowledge_from_other_families_you_know_that_have_nf1.),
+    DontInvestigate = sum(if_you_have_questions_regarding_nf1_do_you_not_obtain_additional_information.))
+display.df <- melt(display.df, 'mode_of_inheritance')
+
+ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
+    geom_bar(stat = 'identity') +
+    facet_grid(~mode_of_inheritance) +
+    geom_text(aes(y = value, label = value),
+              vjust = -0.25,
+              size = 3) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = 'none',
+          axis.title.x = element_blank()) +
+    ggtitle("Where do you obtain knowledge regarding NF1 should you have questions?",
+            "Faceted by mode of inheritance") +
+    ylab("Count")
+```
+
+\pagebreak
+
+```{r explained_medical_aspects}
+display.df <- grand.data %>%
+  group_by(mode_of_inheritance) %>%
+  summarize(
+    Doctor = sum(did_a_doctor_explain_the_medial_aspects_of_nf1_to_you.),
+    GeneticCounselor = sum(did_a_genetic_counselor_explain_the_medial_aspects_of_nf1_to_you.),
+    FamilyMembers = sum(did_a_family_member_explain_the_medial_aspects_of_nf1_to_you.),
+    NoOne = sum(did_no_one_explain_the_medial_aspects_of_nf1_to_you.),
+    NotSure = sum(are_you_not_sure_who_explained_the_medial_aspects_of_nf1_to_you.))
+display.df <- melt(display.df, 'mode_of_inheritance')
+
+ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
+    geom_bar(stat = 'identity') +
+    facet_grid(~mode_of_inheritance) +
+    geom_text(aes(y = value, label = value),
+              vjust = -0.25,
+              size = 3) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = 'none',
+          axis.title.x = element_blank()) +
+    ggtitle("Who explained the medical aspects of NF1 to you?",
+            "Faceted by mode of inheritance") +
+    ylab("Count")
 ```

@@ -51,7 +51,7 @@ group.b <- subset(grand.data, group_id == "Group B")
 group.c <- subset(grand.data, group_id == "Group C")
 ```
 
-## Data Overview & Cleaning
+# Data Overview & Cleaning
 
 There were a total of 303 responses to the questionare:
 
@@ -74,16 +74,17 @@ summary.df <- data.frame(Mean = c(mean(group.a$score),
                                                sd(group.c$score)))
 rownames(summary.df) <- c('Group A','Group B','Group C')
 
-age.range <- range(grand.data$age, na.rm = TRUE)
+
+# removing the "first" two ages from the age range (10 & 15), since I suspect these respondents thought the question
+# was regarding the age of the diagnosed children
+age.range <- range(sort(grand.data$age)[3:length(grand.data$age)], na.rm = TRUE)
 age.mean <- mean(grand.data$age, na.rm = TRUE)
 age.sd <- sd(grand.data$age, na.rm = TRUE)
 ```
 
-\pagebreak
-
 After the above adjustments, the final data set contains 274 respondents, with an age ranging from `r age.range[1]` to `r age.range[2]` and a mean age of `r age.mean`. The standard deviation of the ages is `r age.sd`.
 
-## Testing Methodology
+# Testing Methodology
 
 Although there are only two separate study aims, the first will require a total of 3 pairwise statistical tests, comparing the average test scores of the three groups below to one another using Welch's $t$-Test.
 
@@ -104,9 +105,9 @@ knitr::kable(summary.df,
 
 \pagebreak
 
-### Study Aim 1 - Does the mode of inheritance (familial vs de novo mutations) of the child have an effect on parental knowledge of NF1?
+# Study Aim 1 - Does the mode of inheritance (familial vs de novo mutations) of the child have an effect on parental knowledge of NF1?
 
-#### Test 1
+## Test 1
 
 * $H_0:$ Respondents in Group B do not have a different average test score than respondents in Group A.
 
@@ -141,7 +142,7 @@ Welch's two-tailed $t$-Test returns the above p value, with which we fail to rej
 
 \pagebreak
 
-#### Test 2
+## Test 2
 
 * $H_0:$ Respondents in Group A do not have a higher average test score than respondents in Group C.
 
@@ -175,7 +176,7 @@ Welch's one-sided $t$-Test returns the above p value. Being well below the Bonfe
 
 \pagebreak
 
-#### Test 3
+## Test 3
 
 * $H_0:$ Respondents in Group B do not have a higher average test score than respondents in Group C.
 
@@ -209,7 +210,9 @@ Welch's one-sided $t$-Test returns the above p value. Being well below the Bonfe
 
 \pagebreak
 
-#### Test 4
+# Study Aim 2 - Does exposure to genetic counseling affect knowledge of NF1?
+
+## Test 4
 
 * $H_0:$ Respondents who have seen a genetic counselor do not have a higher average test score than those that have not seen a genetic counselor.
 
@@ -292,26 +295,41 @@ quiz.df <- grand.data[, quiz.questions]
 cronbachs <- cronbach.alpha(quiz.df)$alpha
 ```
 
-### Cronbach's Alpha
+# Cronbach's Alpha
 
 Using 43 quiz questions returned a Cronbach Alpha value of `r cronbachs`.
 
+# Test Limitations
 
-### Test Limitations
+As with any statistical test, there are limitations imposed by the methods I have chosen to use. Contrary to Student's $t$-test, Welch's $t$-test does not assume that the variances of the two samples are equal. However, the assumption that the data is Normally distributed is maintained.
 
-**EXPLANATION OF TEST LIMITATION (MARSHALL NEEDS TO FINISH)**
+The Shapiro-Wilk test is a statistical test used to determine whether that particular sample came from a population that is normally distributed. The null hypothesis of this test is that the sample came from a Normally distributed population, the alternative therefore being that the sample did not originate from a Normally distributed population. As shown in the table below, all samples have a "low" p value from the Shapiro-Wilk test, groups B and C being the only ones that are above the Bonferroni adjusted significance threshold.
 
 ```{r}
-shapiro.test(group.a$score)
-shapiro.test(group.b$score)
-shapiro.test(group.c$score)
-shapiro.test(seen.gc$score)
-shapiro.test(not.seen.gc$score)
+group.a.normality <- shapiro.test(group.a$score)$p.value
+group.b.normality <- shapiro.test(group.b$score)$p.value
+group.c.normality <- shapiro.test(group.c$score)$p.value
+seen.gc.normality <- shapiro.test(seen.gc$score)$p.value
+not.seen.gc.normality <- shapiro.test(not.seen.gc$score)$p.value
+
+summary.df <- data.frame(PValue = c(group.a.normality,
+                                    group.b.normality,
+                                    group.c.normality,
+                                    seen.gc.normality,
+                                    not.seen.gc.normality))
+
+rownames(summary.df) <- c('Group A','Group B','Group C','Seen Genetic Counselor','Not Seen Genetic Counselor')
+knitr::kable(summary.df,
+             caption = 'Shapiro-Wilk Test P-Values')
 ```
+
+This, however, leads to another important topic, the problem of multiple comparisons. When one decides to correct for multiple comparisons, as I have done here using the Bonferroni Correction, the goal is to reduce the probability of a false positive. This practice *necessarily* increases the probability of a false negative. I adjusted the original significance level of 0.05 by accounting for the 4 statistical tests that addressed the study aims of this thesis. However, had I included the above 5 statistical tests that might fall under the heading of *Assumption Testing*, the adjusted significance level would fall to `r alpha/9`. Clearly, deciding where the bounds of a "family" of statistical tests begin and end has a large impact on the whether a particular test is deemed "significant," and, "there is no firm rule on this."$^{[1]}$
+
+The problem of multiple comparisons is an area of active research and, seeing as, "There is no universally accepted approach for dealing with the problem of multiple comparisons,"$^{[1]}$ deciding on the Bonferroni Correction was one of many possible solutions to the problem.
 
 \pagebreak
 
-### Demographic Analysis
+# Demographic Analysis
 
 ```{r proportion_of_respondents_who_have_nf1}
 ggplot(grand.data, aes(do_you_have_nf1., fill = do_you_have_nf1.)) +
@@ -445,6 +463,8 @@ knitr::kable(result,
 
 One person did not answer the question regarding their educational background, and therefore was excluded from the below plot.
 
+\hfill
+
 ```{r educational_background}
 display.df <- grand.data[grand.data$educational_background != "", ]
 
@@ -517,9 +537,10 @@ ggplot(grand.data, aes(how_often_does_your_.oldest._child_see_an_nf_doctor.,
                        y = (..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))) +
     geom_bar(aes(fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
     facet_grid(~mode_of_inheritance) +
-    geom_text(aes(label = round(((..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))*100,2)),
+    geom_text(aes(label = paste(round(((..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))*100,2),'%', sep = '')),
               stat = "count",
-              vjust = -0.25) +
+              vjust = -0.25,
+              size = 3) +
     scale_y_continuous(labels = scales::percent) +
     theme(legend.title = element_blank(),
           legend.position = 'bottom',
@@ -546,7 +567,7 @@ df.d <- melt(display.df, id.vars='how_often_does_your_.oldest._child_see_an_nf_d
 ggplot(df.d, aes(x = how_often_does_your_.oldest._child_see_an_nf_doctor., y = value, fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
     geom_bar(stat = 'identity') +
     scale_y_continuous(labels = scales::percent) +
-    geom_text(aes(y = value, label = round(value*100, 2)),
+    geom_text(aes(y = value, label = paste(round(value*100, 2), '%', sep = '')),
               vjust = -0.25,
               size = 3) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
@@ -585,9 +606,10 @@ ggplot(grand.data,
            y = (..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))) +
     geom_bar(aes(fill = how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.)) +
     facet_grid(~mode_of_inheritance) +
-    geom_text(aes(label = round(((..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))*100,2)),
+    geom_text(aes(label = paste(round(((..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))*100,2),'%', sep = '')),
               stat = "count",
-              vjust = -0.25) +
+              vjust = -0.25,
+              size = 3) +
     scale_y_continuous(labels = scales::percent) +
     theme(legend.title = element_blank(),
           legend.position = 'bottom',
@@ -662,3 +684,7 @@ ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
             "Faceted by mode of inheritance") +
     ylab("Count")
 ```
+
+# References
+
+[1] McDonald, J.H. 2014. Handbook of Biological Statistics (3rd ed.). Sparky House Publishing, Baltimore, Maryland.

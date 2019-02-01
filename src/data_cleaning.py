@@ -55,6 +55,43 @@ def clean_age_of_diagnosis_column(df, column='diagnosis_age_updated'):
     return df_copy
 
 
+def clean_age_column(df, column='at_what_age_were_you_diagnosed_with_nf1?'):
+
+    df_copy = df.copy()
+
+    mask = df_copy[column].str.contains('birth',case=False, na=False)
+
+    df_copy.loc[mask, column] = 0
+
+    # manually setting
+    df_copy.loc[37, column] = 7
+    df_copy.loc[61, column] = 1
+    df_copy.loc[61, column] = 1
+    df_copy.loc[81, column] = float(1/12)
+    df_copy.loc[129, column] = 0
+    df_copy.loc[149, column] = "Unknown"
+    df_copy.loc[152, column] = float(5/12)
+    df_copy.loc[153, column] = 0
+    df_copy.loc[165, column] = 4
+    # setting to same as his/her answer in age column
+    df_copy.loc[179, column] = 29
+    df_copy.loc[197, column] = 5
+    df_copy.loc[201, column] = "Unknown"
+    # his/her mom knew when he/she was born therefore setting to birth/0
+    df_copy.loc[207, column] = 0
+    df_copy.loc[213, column] = float(7/12)
+    # setting to 10 since he/she said 10 or 12
+    df_copy.loc[231, column] = 10
+    df_copy.loc[234, column] = "Unknown"
+    df_copy.loc[239, column] = 4
+    df_copy.loc[278, column] = "Unknown"
+    df_copy.loc[298, column] = 12
+
+    return df_copy
+
+
+
+
 def convert_to_binary(df, columns):
 
     df_copy = df.copy()
@@ -88,6 +125,8 @@ def clean_data(filepath, updated_filepath):
     df.columns = columns
 
     df = clean_age_of_diagnosis_column(df)
+
+    df = clean_age_column(df)
 
     to_binary_columns = ['does_your_oldest_child_see_a_neurologist_for_nf_care?',
          'does_your_oldest_child_see_an_oncologist_for_nf_care?',

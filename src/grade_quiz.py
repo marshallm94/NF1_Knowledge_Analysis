@@ -75,11 +75,14 @@ def grade_quiz(grand_data_filepath, answer_key_filepath):
                         "If you have questions regarding NF1, do you obtain knowledge from other families you know that have NF1?",
                         "Do you not have any questions regarding NF1?",
                         "If you have questions regarding NF1, do you not obtain additional information?",
-                        "If you have questions regarding NF1, do you obtain knowledge from other sources? (please specify)"]
+                        "If you have questions regarding NF1, do you obtain knowledge from other sources? (please specify)",
+                        "At what age were you diagnosed with NF1?"]
 
     updated_cols = []
     for col in demographic_cols:
         updated_cols.append(col.replace(" ","_").replace(',','').lower())
+
+    updated_cols.append('age_of_diagnosis')
 
     for col in updated_cols:
         graded_quiz[col] = df[col].copy()
@@ -122,7 +125,7 @@ def create_groups(df, group_colname="have_you_ever_met_with_a_genetic_counselor?
 if __name__ == "__main__":
 
     df = grade_quiz("../data/grand_data_updated.csv", "../data/grand_data_answer_key_updated.csv")
-
+    
     # drop 11 people who aren't sure if they have nf1
     df = df[df['do_you_have_nf1?'] != "Not sure"].copy()
 

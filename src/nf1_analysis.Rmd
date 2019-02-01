@@ -26,6 +26,7 @@ knitr::opts_chunk$set(echo = FALSE,
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(ggpubr))
 suppressPackageStartupMessages(library(ltm))
 
 # load & setup data
@@ -683,6 +684,27 @@ ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
     ggtitle("Who explained the medical aspects of NF1 to you?",
             "Faceted by mode of inheritance") +
     ylab("Count")
+```
+
+\pagebreak
+
+```{r pairwise_age}
+display.df <-  grand.data[grand.data$at_what_age_were_you_diagnosed_with_nf1. != "", c('at_what_age_were_you_diagnosed_with_nf1.','age_of_diagnosis')]
+
+colnames(display.df) <- c('Parent','Child')
+display.df <- display.df[display.df$Parent != 'Unknown',]
+display.df$Parent <- as.numeric(display.df$Parent)
+
+ggpaired(display.df,
+         cond1 = 'Parent',
+         cond2 = 'Child',
+         fill = 'condition',
+         palette = 'jco',
+         xlab = "",
+         ylab = "Age of Diagnosis",
+         ggtheme = theme_gray()) +
+  theme(legend.position = 'none') +
+  ggtitle("Familial Relationship: Age of Diagnosis")
 ```
 
 # References

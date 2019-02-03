@@ -83,6 +83,8 @@ def grade_quiz(grand_data_filepath, answer_key_filepath):
         updated_cols.append(col.replace(" ","_").replace(',','').lower())
 
     updated_cols.append('age_of_diagnosis')
+    updated_cols.append('how_would_you_describe_the_severity_of_your_nf1_symptoms?')
+    updated_cols.append('how_often_do_you_see_doctor_for_nf_or_follow_at_an_nf_clinic?')
 
     for col in updated_cols:
         graded_quiz[col] = df[col].copy()
@@ -125,7 +127,7 @@ def create_groups(df, group_colname="have_you_ever_met_with_a_genetic_counselor?
 if __name__ == "__main__":
 
     df = grade_quiz("../data/grand_data_updated.csv", "../data/grand_data_answer_key_updated.csv")
-    
+
     # drop 11 people who aren't sure if they have nf1
     df = df[df['do_you_have_nf1?'] != "Not sure"].copy()
 

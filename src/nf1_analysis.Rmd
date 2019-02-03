@@ -707,6 +707,46 @@ ggpaired(display.df,
   ggtitle("Familial Relationship: Age of Diagnosis")
 ```
 
+\pagebreak
+
+```{r pairwise_severity_of_symptoms}
+display.df <-  grand.data[grand.data$how_would_you_describe_the_severity_of_your_nf1_symptoms. != "", c('how_would_you_describe_the_severity_of_your_nf1_symptoms.','how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.')]
+
+colnames(display.df) <- c('Parent','Child')
+
+ggpaired(display.df,
+         cond1 = 'Parent',
+         cond2 = 'Child',
+         fill = 'condition',
+         xlab = "",
+         ylab = "Severity of Symptoms",
+         ggtheme = theme_gray()) +
+  theme(legend.position = 'none') +
+  ggtitle("Familial Relationship: Severity of Symptoms")
+
+display.table <- table(display.df$Parent, display.df$Child)[2:5,]
+knitr::kable(display.table,
+             caption = 'Familial Relationship: Severity of Symptoms')
+```
+
+\pagebreak
+
+```{r pairwise_doctor_frequency}
+display.df <-  grand.data[grand.data$how_often_do_you_see_doctor_for_nf_or_follow_at_an_nf_clinic. != "", c('how_often_do_you_see_doctor_for_nf_or_follow_at_an_nf_clinic.','how_often_does_your_.oldest._child_see_an_nf_doctor.')]
+
+colnames(display.df) <- c('Parent','Child')
+
+ggpaired(display.df,
+         cond1 = 'Parent',
+         cond2 = 'Child',
+         fill = 'condition',
+         xlab = "",
+         ylab = "Frequency of Visits",
+         ggtheme = theme_gray()) +
+  theme(legend.position = 'none') +
+  ggtitle("Familial Relationship: Frequency of Doctor Visits")
+```
+
 # References
 
 [1] McDonald, J.H. 2014. Handbook of Biological Statistics (3rd ed.). Sparky House Publishing, Baltimore, Maryland.

@@ -52,6 +52,8 @@ group.b <- subset(grand.data, group_id == "Group B")
 group.c <- subset(grand.data, group_id == "Group C")
 ```
 
+\pagebreak
+
 # Data Overview & Cleaning
 
 There were a total of 303 responses to the questionare:
@@ -124,6 +126,11 @@ test.1.data <- rbind.data.frame(group.a, group.b)
 
 subtitle <- paste("Mean's of each group displayed as vertical lines: Group A =", round(mean(group.a$score), 4), "|", "Group B =", round(mean(group.b$score), 4))
 
+tiff(filename = '../images/GroupAvsGroupB.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(test.1.data, aes(score, fill = group_id)) +
     geom_density(alpha = 0.5) +
     geom_vline(xintercept = mean(group.a$score), color = '#F8766D') +
@@ -134,14 +141,16 @@ ggplot(test.1.data, aes(score, fill = group_id)) +
             subtitle = subtitle) +
     xlab("Test Score") +
     ylab("Density")
-
+dev.off()
 
 print(paste("Test 1 p value =", test.1.results$p.value))
 ```
 
 Welch's two-tailed $t$-Test returns the above p value, with which we fail to reject the null hypothesis.
 
-\pagebreak
+See the file GroupAvsGroupB.png, in the images directory.
+
+\hfill
 
 ## Test 2
 
@@ -159,6 +168,11 @@ test.2.data <- rbind.data.frame(group.a, group.c)
 
 subtitle <- paste("Mean's of each group displayed as vertical lines: Group A =", round(mean(group.a$score), 4), "|", "Group C =", round(mean(group.c$score), 4))
 
+tiff(filename = '../images/GroupAvsGroupC.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(test.2.data, aes(score, fill = group_id)) +
     geom_density(alpha = 0.5) +
     geom_vline(xintercept = mean(group.a$score), color = '#F8766D') +
@@ -169,13 +183,16 @@ ggplot(test.2.data, aes(score, fill = group_id)) +
             subtitle = subtitle) +
     xlab("Test Score") +
     ylab("Density")
+dev.off()
 
 print(paste("Test 2 p value =", test.2.results$p.value))
 ```
 
 Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
 
-\pagebreak
+See the file GroupAvsGroupC.png, in the images directory.
+
+\hfill
 
 ## Test 3
 
@@ -193,6 +210,11 @@ test.3.data <- rbind.data.frame(group.b, group.c)
 
 subtitle <- paste("Mean's of each group displayed as vertical lines: Group B =", round(mean(group.b$score), 4), "|", "Group C =", round(mean(group.c$score), 4))
 
+tiff(filename = '../images/GroupBvsGroupC.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(test.3.data, aes(score, fill = group_id)) +
     geom_density(alpha = 0.5) +
     geom_vline(xintercept = mean(group.b$score), color = '#F8766D') +
@@ -203,11 +225,14 @@ ggplot(test.3.data, aes(score, fill = group_id)) +
             subtitle = subtitle) +
     xlab("Test Score") +
     ylab("Density")
+dev.off()
 
 print(paste("Test 3 p value =", test.3.results$p.value))
 ```
 
 Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
+
+See the file GroupBvsGroupC.png, in the images directory.
 
 \pagebreak
 
@@ -230,6 +255,11 @@ test.4.data <- rbind.data.frame(seen.gc, not.seen.gc)
 
 subtitle <- paste("Mean's of each group displayed as vertical lines: Yes =", round(mean(seen.gc$score), 4), "|", "No =", round(mean(not.seen.gc$score), 4))
 
+tiff(filename = '../images/SeenGCvsNotSeenGC.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(test.4.data, aes(score, fill = seen_gc)) +
     geom_density(alpha = 0.5) +
     geom_vline(xintercept = mean(seen.gc$score), color = '#F8766D') +
@@ -240,12 +270,14 @@ ggplot(test.4.data, aes(score, fill = seen_gc)) +
             subtitle = subtitle) +
     xlab("Test Score") +
     ylab("Density")
+dev.off()
 
 print(paste("Test 4 p value =", test.3.results$p.value))
 ```
 
 Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
 
+See the file SeenGCvsNotSeenGC.png, in the images directory.
 
 ```{r cronbachs_alpha, include=FALSE}
 quiz.questions <- c('one_half_or_50._of_genetic_information_is_passed_down_from_mother_to_child',
@@ -298,11 +330,15 @@ cronbachs <- cronbach.alpha(quiz.df)$alpha
 
 # Cronbach's Alpha
 
-Using 43 quiz questions returned a Cronbach Alpha value of `r cronbachs`.
+Cronbach's alpha is a statistic used to measure the reliability of a set of test items, or more specifically, how well a set of test items (questions) measures the underlying concept which the test is attempting to assess. In the context, of this thesis, the Cronbach's Alpha can be interpreted as a numeric summary of how well the knowledge based questions assess a respondents true knowledge level of NF1.
+
+Using 43 quiz questions returned a Cronbach's Alpha value of `r cronbachs`.
+
+\pagebreak
 
 # Test Limitations
 
-As with any statistical test, there are limitations imposed by the methods I have chosen to use. Contrary to Student's $t$-test, Welch's $t$-test does not assume that the variances of the two samples are equal. However, the assumption that the data is Normally distributed is maintained.
+As with any statistical test, there are limitations imposed by the methods I have chosen to use. In contrast to Student's $t$-test, Welch's $t$-test does not assume that the variances of the two samples are equal. However, the assumption that the data is Normally distributed is maintained.
 
 The Shapiro-Wilk test is a statistical test used to determine whether that particular sample came from a population that is normally distributed. The null hypothesis of this test is that the sample came from a Normally distributed population, the alternative therefore being that the sample did not originate from a Normally distributed population. As shown in the table below, all samples have a "low" p value from the Shapiro-Wilk test, groups B and C being the only ones that are above the Bonferroni adjusted significance threshold.
 
@@ -333,6 +369,11 @@ The problem of multiple comparisons is an area of active research and, seeing as
 # Demographic Analysis
 
 ```{r proportion_of_respondents_who_have_nf1}
+tiff(filename = '../images/HaveNF1.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(grand.data, aes(do_you_have_nf1., fill = do_you_have_nf1.)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
     geom_text(aes(y = ((..count..)/sum(..count..)),
@@ -347,6 +388,8 @@ ggplot(grand.data, aes(do_you_have_nf1., fill = do_you_have_nf1.)) +
           axis.text.x = element_blank()) +
     ggtitle("Do you have have NF1?") +
     ylab("Proportion")
+dev.off()
+
 
 result <- table(grand.data$do_you_have_nf1.)
 knitr::kable(result,
@@ -354,9 +397,16 @@ knitr::kable(result,
              col.names = c('Response','Count'))
 ```
 
+The plot associated with the above table is HaveNF1.png, in the images directory.
+
 \hfill
 
 ```{r proportion_of_respondents_who_have_met_a_gc}
+tiff(filename = '../images/MetGC.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
                        fill = have_you_ever_met_with_a_genetic_counselor.)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
@@ -372,6 +422,7 @@ ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
           axis.text.x = element_blank()) +
     ggtitle("Have you ever met with a Genetic Counselor?") +
     ylab("Proportion")
+dev.off()
 
 result <- table(grand.data$have_you_ever_met_with_a_genetic_counselor.)
 knitr::kable(result,
@@ -379,11 +430,18 @@ knitr::kable(result,
              col.names = c('Response','Count'))
 ```
 
+The plot associated with the above table is MetGC.png, in the images directory.
+
 \hfill
 
 ```{r employment_status}
 grand.data$employment_status <- sub("^$", "Unknown", grand.data$employment_status)
 
+tiff(filename = '../images/EmploymentStatusDistribution.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(grand.data, aes(employment_status,
                        fill = employment_status)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
@@ -399,6 +457,7 @@ ggplot(grand.data, aes(employment_status,
           axis.text.x = element_blank()) +
     ggtitle("Employment Status") +
     ylab("Proportion")
+dev.off()
 
 result <- table(grand.data$employment_status)
 knitr::kable(result,
@@ -406,11 +465,18 @@ knitr::kable(result,
              col.names = c('Response','Count'))
 ```
 
-\hfill
+The plot associated with the above table is EmploymentStatusDistribution.png, in the images directory.
+
+\pagebreak
 
 ```{r gender}
 grand.data$gender <- sub("^$", "Unknown", grand.data$gender)
 
+tiff(filename = '../images/GenderDistribution.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(grand.data, aes(gender,
                        fill = gender)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
@@ -426,6 +492,7 @@ ggplot(grand.data, aes(gender,
           axis.text.x = element_blank()) +
     ggtitle("Gender") +
     ylab("Proportion")
+dev.off()
 
 result <- table(grand.data$gender)
 knitr::kable(result,
@@ -433,11 +500,18 @@ knitr::kable(result,
              col.names = c('Response','Count'))
 ```
 
+The plot associated with the above table is GenderDistribution.png, in the images directory.
+
 \hfill
 
 ```{r ethnicity}
 grand.data$ethnicity <- sub("^$", "Unkown", grand.data$ethnicity)
 
+tiff(filename = '../images/EthnicityDistribution.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(grand.data, aes(ethnicity,
                        fill = ethnicity)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
@@ -453,12 +527,15 @@ ggplot(grand.data, aes(ethnicity,
           axis.text.x = element_blank()) +
     ggtitle("Ethnicity") +
     ylab("Proportion")
+dev.off()
 
 result <- table(grand.data$ethnicity)
 knitr::kable(result,
              caption = "Ethnicity",
              col.names = c('Response \t','Count'))
 ```
+
+The plot associated with the above table is EthnicityDistribution.png, in the images directory.
 
 \pagebreak
 
@@ -469,6 +546,11 @@ One person did not answer the question regarding their educational background, a
 ```{r educational_background}
 display.df <- grand.data[grand.data$educational_background != "", ]
 
+tiff(filename = '../images/EducationDistribution.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(display.df, aes(educational_background,
                        fill = educational_background)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
@@ -484,6 +566,7 @@ ggplot(display.df, aes(educational_background,
           axis.text.x = element_blank()) +
     ggtitle("Educational Background") +
     ylab("Proportion")
+dev.off()
 
 result <- table(display.df$educational_background)
 knitr::kable(result[2:length(result)],
@@ -491,7 +574,9 @@ knitr::kable(result[2:length(result)],
              col.names = c('Response \t','Count'))
 ```
 
-\pagebreak
+The plot associated with the above table is EducationDistribution.png, in the images directory.
+
+\hfill
 
 It is important to note that the answers to the below question, "What specialists does your affected child see?" are not mutually exclusive - children who see a Neurologist may have seen an Oncologist and a Geneticist as well. 
 
@@ -516,7 +601,11 @@ display.df <- grand.data %>%
               Dermatologist = sum(does_your_oldest_child_see_a_pediatrician_for_nf_care.))
 df.d <- melt(display.df, id.vars='mode_of_inheritance')
 
-
+tiff(filename = '../images/SpecialistsByModeOfInheritance.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(df.d, aes(x = variable, y = value, fill = variable)) +
     geom_bar(stat = 'identity') +
     facet_grid(~mode_of_inheritance) +
@@ -529,11 +618,19 @@ ggplot(df.d, aes(x = variable, y = value, fill = variable)) +
     ggtitle("What specialists does your affected child see?",
             "Faceted by mode of inheritance") +
     ylab("Count")
+dev.off()
 ```
 
-\pagebreak
+See the file SpecialistsByModeOfInheritance.png, in the images directory.
+
+\hfill
 
 ```{r frequency_of_visits}
+tiff(filename = '../images/FrequencyOfVisitsByModeOfInerheritance.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(grand.data, aes(how_often_does_your_.oldest._child_see_an_nf_doctor.,
                        y = (..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))) +
     geom_bar(aes(fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
@@ -550,13 +647,16 @@ ggplot(grand.data, aes(how_often_does_your_.oldest._child_see_an_nf_doctor.,
           axis.text.x = element_blank()) +
     ggtitle("How often does your oldest child see a NF1 doctor?") +
     ylab("Proportion")
+dev.off()
 
 result <- table(grand.data$how_often_does_your_.oldest._child_see_an_nf_doctor., grand.data$mode_of_inheritance)
 knitr::kable(result,
              caption = "How often does your oldest child see a NF1 doctor?")
 ```
 
-\hfill
+The plot associated with the above table is FrequencyOfVisitsByModeOfInerheritance.png, in the images directory.
+
+\pagebreak
 
 ```{r frequency_of_visits_vs_score}
 display.df <- grand.data %>%
@@ -564,7 +664,11 @@ display.df <- grand.data %>%
     summarise(mean_score = mean(score))
 df.d <- melt(display.df, id.vars='how_often_does_your_.oldest._child_see_an_nf_doctor.')
 
-
+tiff(filename = '../images/FrequencyOfVisitsAgainstQuizScore.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(df.d, aes(x = how_often_does_your_.oldest._child_see_an_nf_doctor., y = value, fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
     geom_bar(stat = 'identity') +
     scale_y_continuous(labels = scales::percent) +
@@ -576,11 +680,19 @@ ggplot(df.d, aes(x = how_often_does_your_.oldest._child_see_an_nf_doctor., y = v
           axis.title.x = element_blank()) +
     ggtitle("How often does your oldest child see a NF1 doctor?") +
     ylab("Mean Quiz Score")
+dev.off()
 ```
+
+See the file FrequencyOfVisitsAgainstQuizScore.png, in the images directory.
 
 \hfill
 
 ```{r mode_of_inheritance_vs_seen_gc}
+tiff(filename = '../images/MetGCByModeOfInheritance.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
                        fill = have_you_ever_met_with_a_genetic_counselor.)) +
     geom_bar(aes(y = (..count..))) +
@@ -597,11 +709,19 @@ ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
     ggtitle("Have you ever met with a Genetic Counselor?",
             "Faceted by mode of inheritance") +
     ylab("Count")
+dev.off()
 ```
+
+See the file MetGCByModeOfInheritance.png, in the images directory.
 
 \hfill
 
 ```{r severity_symptoms}
+tiff(filename = '../images/SeverityOfSymptomsByModeOfInheritance.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(grand.data,
        aes(how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.,
            y = (..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))) +
@@ -620,13 +740,16 @@ ggplot(grand.data,
     ggtitle("How would you describe the severity of symptoms\nof your oldest child with NF1?",
             "Faceted by mode of inheritance") +
     ylab("Proportion")
+dev.off()
 
 result <- table(grand.data$how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1., grand.data$mode_of_inheritance)
 knitr::kable(result,
              caption = "How would you describe the severity of symptoms of your oldest child with NF1?")
 ```
 
-\pagebreak
+The plot associated with the above table is SeverityOfSymptomsByModeOfInheritance.png, in the images directory.
+
+\hfill
 
 Similar to one of the previous plots, it is important to note that the answers to the below question, "Where do you obtain knowledge regarding NF1 should you have questions?" are not mutually exclusive - parents who ask their doctor might also reference online sources.
 
@@ -645,6 +768,11 @@ display.df <- grand.data %>%
     DontInvestigate = sum(if_you_have_questions_regarding_nf1_do_you_not_obtain_additional_information.))
 display.df <- melt(display.df, 'mode_of_inheritance')
 
+tiff(filename = '../images/ObtainKnowledgeByModeOfInheritance.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
     geom_bar(stat = 'identity') +
     facet_grid(~mode_of_inheritance) +
@@ -657,9 +785,12 @@ ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
     ggtitle("Where do you obtain knowledge regarding NF1 should you have questions?",
             "Faceted by mode of inheritance") +
     ylab("Count")
+dev.off()
 ```
 
-\pagebreak
+See the file ObtainKnowledgeByModeOfInheritance.png, in the images directory.
+
+\hfill
 
 ```{r explained_medical_aspects}
 display.df <- grand.data %>%
@@ -672,6 +803,11 @@ display.df <- grand.data %>%
     NotSure = sum(are_you_not_sure_who_explained_the_medial_aspects_of_nf1_to_you.))
 display.df <- melt(display.df, 'mode_of_inheritance')
 
+tiff(filename = '../images/MedicalExplanationByModeOfInheritance.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
     geom_bar(stat = 'identity') +
     facet_grid(~mode_of_inheritance) +
@@ -684,9 +820,12 @@ ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
     ggtitle("Who explained the medical aspects of NF1 to you?",
             "Faceted by mode of inheritance") +
     ylab("Count")
+dev.off()
 ```
 
-\pagebreak
+See the file MedicalExplanationByModeOfInheritance.png, in the images directory.
+
+\hfill
 
 ```{r pairwise_age}
 display.df <-  grand.data[grand.data$at_what_age_were_you_diagnosed_with_nf1. != "", c('at_what_age_were_you_diagnosed_with_nf1.','age_of_diagnosis')]
@@ -695,6 +834,11 @@ colnames(display.df) <- c('Parent','Child')
 display.df <- display.df[display.df$Parent != 'Unknown',]
 display.df$Parent <- as.numeric(display.df$Parent)
 
+tiff(filename = '../images/AgeOfDiagnosisFamilialRelationship.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggpaired(display.df,
          cond1 = 'Parent',
          cond2 = 'Child',
@@ -705,7 +849,10 @@ ggpaired(display.df,
          ggtheme = theme_gray()) +
   theme(legend.position = 'none') +
   ggtitle("Familial Relationship: Age of Diagnosis")
+dev.off()
 ```
+
+See the file AgeOfDiagnosisFamilialRelationship.png, in the images directory.
 
 \pagebreak
 
@@ -714,6 +861,11 @@ display.df <-  grand.data[grand.data$how_would_you_describe_the_severity_of_your
 
 colnames(display.df) <- c('Parent','Child')
 
+tiff(filename = '../images/SeverityOfSymptomsFamilialRelationship.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggpaired(display.df,
          cond1 = 'Parent',
          cond2 = 'Child',
@@ -723,19 +875,27 @@ ggpaired(display.df,
          ggtheme = theme_gray()) +
   theme(legend.position = 'none') +
   ggtitle("Familial Relationship: Severity of Symptoms")
+dev.off()
 
 display.table <- table(display.df$Parent, display.df$Child)[2:5,]
 knitr::kable(display.table,
              caption = 'Familial Relationship: Severity of Symptoms')
 ```
 
-\pagebreak
+The plot associated with the above table is SeverityOfSymptomsFamilialRelationship.png, in the images directory.
+
+\hfill
 
 ```{r pairwise_doctor_frequency}
 display.df <-  grand.data[grand.data$how_often_do_you_see_doctor_for_nf_or_follow_at_an_nf_clinic. != "", c('how_often_do_you_see_doctor_for_nf_or_follow_at_an_nf_clinic.','how_often_does_your_.oldest._child_see_an_nf_doctor.')]
 
 colnames(display.df) <- c('Parent','Child')
 
+tiff(filename = '../images/FrequencyOfVisitsFamilialRelationship.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggpaired(display.df,
          cond1 = 'Parent',
          cond2 = 'Child',
@@ -745,7 +905,10 @@ ggpaired(display.df,
          ggtheme = theme_gray()) +
   theme(legend.position = 'none') +
   ggtitle("Familial Relationship: Frequency of Doctor Visits")
+dev.off()
 ```
+
+See the file FrequencyOfVisitsFamilialRelationship.png, in the images directory.
 
 # References
 

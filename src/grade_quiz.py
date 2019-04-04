@@ -127,7 +127,7 @@ def create_groups(df, group_colname="have_you_ever_met_with_a_genetic_counselor?
 if __name__ == "__main__":
 
     df = grade_quiz("../data/grand_data_updated.csv", "../data/grand_data_answer_key_updated.csv")
-
+    
     # drop 11 people who aren't sure if they have nf1
     df = df[df['do_you_have_nf1?'] != "Not sure"].copy()
 

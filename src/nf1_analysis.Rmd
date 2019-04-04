@@ -130,13 +130,14 @@ tiff(filename = '../images/GroupAvsGroupB.png',
      units = 'in',
      width = 8,
      height = 5,
-     res = 300)
+    res = 300)
 ggplot(test.1.data, aes(score, fill = group_id)) +
     geom_density(alpha = 0.5) +
-    geom_vline(xintercept = mean(group.a$score), color = '#F8766D') +
-    geom_vline(xintercept = mean(group.b$score), color = '#00BFC4') +
+    geom_vline(xintercept = mean(group.a$score), color = 'darkgreen') +
+    geom_vline(xintercept = mean(group.b$score), color = 'orange') +
     theme(legend.position="bottom") +
     theme(legend.title=element_blank()) +
+    scale_fill_manual(values = c('darkgreen','orange')) +
     ggtitle("Group A vs. Group B",
             subtitle = subtitle) +
     xlab("Test Score") +
@@ -175,10 +176,11 @@ tiff(filename = '../images/GroupAvsGroupC.png',
      res = 300)
 ggplot(test.2.data, aes(score, fill = group_id)) +
     geom_density(alpha = 0.5) +
-    geom_vline(xintercept = mean(group.a$score), color = '#F8766D') +
-    geom_vline(xintercept = mean(group.c$score), color = '#00BFC4') +
+    geom_vline(xintercept = mean(group.a$score), color = 'darkgreen') +
+    geom_vline(xintercept = mean(group.c$score), color = 'purple') +
     theme(legend.position="bottom") +
     theme(legend.title=element_blank()) +
+    scale_fill_manual(values = c('darkgreen','purple')) +
     ggtitle("Group A vs. Group C",
             subtitle = subtitle) +
     xlab("Test Score") +
@@ -217,10 +219,11 @@ tiff(filename = '../images/GroupBvsGroupC.png',
      res = 300)
 ggplot(test.3.data, aes(score, fill = group_id)) +
     geom_density(alpha = 0.5) +
-    geom_vline(xintercept = mean(group.b$score), color = '#F8766D') +
-    geom_vline(xintercept = mean(group.c$score), color = '#00BFC4') +
+    geom_vline(xintercept = mean(group.b$score), color = 'orange') +
+    geom_vline(xintercept = mean(group.c$score), color = 'purple') +
     theme(legend.position="bottom") +
     theme(legend.title=element_blank()) +
+    scale_fill_manual(values = c('orange','purple')) +
     ggtitle("Group B vs. Group C",
             subtitle = subtitle) +
     xlab("Test Score") +
@@ -255,22 +258,22 @@ test.4.data <- rbind.data.frame(seen.gc, not.seen.gc)
 
 subtitle <- paste("Mean's of each group displayed as vertical lines: Yes =", round(mean(seen.gc$score), 4), "|", "No =", round(mean(not.seen.gc$score), 4))
 
-tiff(filename = '../images/SeenGCvsNotSeenGC.png',
-     units = 'in',
-     width = 8,
-     height = 5,
-     res = 300)
+#tiff(filename = '../images/SeenGCvsNotSeenGC.png',
+#     units = 'in',
+#     width = 8,
+#     height = 5,
+#     res = 300)
 ggplot(test.4.data, aes(score, fill = seen_gc)) +
     geom_density(alpha = 0.5) +
-    geom_vline(xintercept = mean(seen.gc$score), color = '#F8766D') +
-    geom_vline(xintercept = mean(not.seen.gc$score), color = '#00BFC4') +
+    geom_vline(xintercept = mean(not.seen.gc$score), color = '#F8766D') +
+    geom_vline(xintercept = mean(seen.gc$score), color = '#00BFC4') +
     theme(legend.position="bottom") +
     theme(legend.title=element_blank()) +
     ggtitle("Have you seen a Genetic Counselor?",
             subtitle = subtitle) +
     xlab("Test Score") +
     ylab("Density")
-dev.off()
+#dev.off()
 
 print(paste("Test 4 p value =", test.3.results$p.value))
 ```

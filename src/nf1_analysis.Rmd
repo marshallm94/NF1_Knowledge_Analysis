@@ -258,11 +258,11 @@ test.4.data <- rbind.data.frame(seen.gc, not.seen.gc)
 
 subtitle <- paste("Mean's of each group displayed as vertical lines: Yes =", round(mean(seen.gc$score), 4), "|", "No =", round(mean(not.seen.gc$score), 4))
 
-#tiff(filename = '../images/SeenGCvsNotSeenGC.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+tiff(filename = '../images/SeenGCvsNotSeenGC.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
 ggplot(test.4.data, aes(score, fill = seen_gc)) +
     geom_density(alpha = 0.5) +
     geom_vline(xintercept = mean(not.seen.gc$score), color = '#F8766D') +
@@ -273,7 +273,7 @@ ggplot(test.4.data, aes(score, fill = seen_gc)) +
             subtitle = subtitle) +
     xlab("Test Score") +
     ylab("Density")
-#dev.off()
+dev.off()
 
 print(paste("Test 4 p value =", test.3.results$p.value))
 ```

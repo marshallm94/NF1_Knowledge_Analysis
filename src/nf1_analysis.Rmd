@@ -515,17 +515,22 @@ The plot associated with the above table is GenderDistribution.png, in the image
 ```{r ethnicity}
 grand.data$ethnicity <- sub("^$", "Unkown", grand.data$ethnicity)
 
+display.df <- as.data.frame(grand.data %>%
+    count(ethnicity) %>%
+    arrange(desc(n))) %>%
+    mutate(ethnicity = factor(ethnicity, ethnicity))
+
 tiff(filename = '../images/EthnicityDistribution.png',
      units = 'in',
      width = 8,
      height = 5,
      res = 300)
-ggplot(grand.data, aes(ethnicity,
+ggplot(display.df, aes(x = reorder(ethnicity, -n),
+                       y = n,
                        fill = ethnicity)) +
-    geom_bar(aes(y = (..count..)/sum(..count..))) +
-    geom_text(aes(y = ((..count..)/sum(..count..)),
-                  label = scales::percent((..count..)/sum(..count..))),
-              stat = "count",
+    geom_bar(aes(y = n/sum(display.df$n)), stat = 'identity') +
+    geom_text(aes(y = n/sum(display.df$n),
+                  label = scales::percent(n/sum(display.df$n))),
               vjust = -0.25) +
     scale_y_continuous(labels = scales::percent) +
     theme(legend.title = element_blank(),
@@ -536,6 +541,7 @@ ggplot(grand.data, aes(ethnicity,
     ggtitle("Ethnicity") +
     ylab("Proportion")
 dev.off()
+
 
 result <- table(grand.data$ethnicity)
 knitr::kable(result,
@@ -552,19 +558,26 @@ One person did not answer the question regarding their educational background, a
 \hfill
 
 ```{r educational_background}
-display.df <- grand.data[grand.data$educational_background != "", ]
+levels(grand.data$educational_background) <- c('Unkown',
+                                               levels(grand.data$educational_background)[2:length(levels(grand.data$educational_background))])
+grand.data[is.na(grand.data$educational_background), "educational_background"] <- 'Unkown'
+
+display.df <- as.data.frame(grand.data %>%
+    count(educational_background) %>%
+    arrange(desc(n))) %>%
+    mutate(educational_background = factor(educational_background, educational_background))
 
 tiff(filename = '../images/EducationDistribution.png',
      units = 'in',
      width = 8,
      height = 5,
      res = 300)
-ggplot(display.df, aes(educational_background,
+ggplot(display.df, aes(x = reorder(educational_background, -n),
+                       y = n,
                        fill = educational_background)) +
-    geom_bar(aes(y = (..count..)/sum(..count..))) +
-    geom_text(aes(y = ((..count..)/sum(..count..)),
-                  label = scales::percent((..count..)/sum(..count..))),
-              stat = "count",
+    geom_bar(aes(y = n/sum(display.df$n)), stat = 'identity') +
+    geom_text(aes(y = n/sum(display.df$n),
+                  label = scales::percent(n/sum(display.df$n))),
               vjust = -0.25) +
     scale_y_continuous(labels = scales::percent) +
     theme(legend.title = element_blank(),
@@ -576,7 +589,7 @@ ggplot(display.df, aes(educational_background,
     ylab("Proportion")
 dev.off()
 
-result <- table(display.df$educational_background)
+result <- table(grand.data$educational_background)
 knitr::kable(result[2:length(result)],
              caption = "Educational Background",
              col.names = c('Response \t','Count'))

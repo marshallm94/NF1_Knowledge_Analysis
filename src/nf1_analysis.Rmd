@@ -440,17 +440,22 @@ The plot associated with the above table is MetGC.png, in the images directory.
 ```{r employment_status}
 grand.data$employment_status <- sub("^$", "Unknown", grand.data$employment_status)
 
+display.df <- as.data.frame(grand.data %>%
+    count(employment_status) %>%
+    arrange(desc(n))) %>%
+    mutate(employment_status = factor(employment_status, employment_status))
+
 tiff(filename = '../images/EmploymentStatusDistribution.png',
      units = 'in',
      width = 8,
      height = 5,
      res = 300)
-ggplot(grand.data, aes(employment_status,
+ggplot(display.df, aes(x = reorder(employment_status, -n),
+                       y = n,
                        fill = employment_status)) +
-    geom_bar(aes(y = (..count..)/sum(..count..))) +
-    geom_text(aes(y = ((..count..)/sum(..count..)),
-                  label = scales::percent((..count..)/sum(..count..))),
-              stat = "count",
+    geom_bar(aes(y = n/sum(display.df$n)), stat = 'identity') +
+    geom_text(aes(y = n/sum(display.df$n),
+                  label = scales::percent(n/sum(display.df$n))),
               vjust = -0.25) +
     scale_y_continuous(labels = scales::percent) +
     theme(legend.title = element_blank(),

@@ -622,12 +622,24 @@ display.df <- grand.data %>%
               Dermatologist = sum(does_your_oldest_child_see_a_pediatrician_for_nf_care.))
 df.d <- melt(display.df, id.vars='mode_of_inheritance')
 
+de.novo <- df.d[df.d$mode_of_inheritance == 'De Novo',] %>%
+    arrange(desc(value)) %>%
+    mutate(variable = factor(variable, variable))
+
+inherited <- df.d[df.d$mode_of_inheritance != 'De Novo',] %>%
+    arrange(desc(value)) %>%
+    mutate(variable = factor(variable, variable))
+
+df.d <- rbind(de.novo, inherited)
+
 tiff(filename = '../images/SpecialistsByModeOfInheritance.png',
      units = 'in',
      width = 8,
      height = 5,
      res = 300)
-ggplot(df.d, aes(x = variable, y = value, fill = variable)) +
+ggplot(df.d, aes(x = reorder(variable, -value),
+                 y = value,
+                 fill = variable)) +
     geom_bar(stat = 'identity') +
     facet_grid(~mode_of_inheritance) +
     geom_text(aes(y = value, label = value),

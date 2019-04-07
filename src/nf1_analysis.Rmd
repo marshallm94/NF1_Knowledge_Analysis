@@ -563,21 +563,33 @@ levels(grand.data$educational_background) <- c('Unkown',
 grand.data[is.na(grand.data$educational_background), "educational_background"] <- 'Unkown'
 
 display.df <- as.data.frame(grand.data %>%
-    count(educational_background) %>%
-    arrange(desc(n))) %>%
+                                group_by(mode_of_inheritance) %>%
+                                count(educational_background))
+
+inherited <- display.df[display.df$mode_of_inheritance != 'De Novo', ] %>%
+    mutate(percentage = n/sum(n)) %>%
+    arrange(desc(percentage)) %>%
     mutate(educational_background = factor(educational_background, educational_background))
+
+de.novo <- display.df[display.df$mode_of_inheritance == 'De Novo', ] %>%
+    mutate(percentage = n/sum(n)) %>%
+    arrange(desc(percentage)) %>%
+    mutate(educational_background = factor(educational_background, educational_background))
+                            
+display.df <- rbind(de.novo, inherited)
 
 tiff(filename = '../images/EducationDistribution.png',
      units = 'in',
      width = 8,
      height = 5,
      res = 300)
-ggplot(display.df, aes(x = reorder(educational_background, -n),
-                       y = n,
+ggplot(display.df, aes(x = educational_background,
+                       y = percentage,
                        fill = educational_background)) +
-    geom_bar(aes(y = n/sum(display.df$n)), stat = 'identity') +
-    geom_text(aes(y = n/sum(display.df$n),
-                  label = scales::percent(n/sum(display.df$n))),
+    geom_bar(stat = 'identity') +
+    facet_grid(~mode_of_inheritance) +
+    geom_text(aes(y = percentage,
+                  label = scales::percent(percentage)),
               vjust = -0.25) +
     scale_y_continuous(labels = scales::percent) +
     theme(legend.title = element_blank(),

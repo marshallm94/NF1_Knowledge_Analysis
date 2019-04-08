@@ -813,12 +813,26 @@ display.df <- grand.data %>%
     DontInvestigate = sum(if_you_have_questions_regarding_nf1_do_you_not_obtain_additional_information.))
 display.df <- melt(display.df, 'mode_of_inheritance')
 
+levels(display.df$variable) <- c('Doctor', 'NF1 Organization', 'Family Members', 'Online Sources', 'Social Media', 'Other Families', "Dont Investigate")
+
+de.novo <- display.df[display.df$mode_of_inheritance == 'De Novo',] %>%
+    arrange(desc(value)) %>%
+    mutate(variable = factor(variable, variable))
+
+inherited <- display.df[display.df$mode_of_inheritance != 'De Novo',] %>%
+    arrange(desc(value)) %>%
+    mutate(variable = factor(variable, variable))
+
+display.df <- rbind(de.novo, inherited)
+
 tiff(filename = '../images/ObtainKnowledgeByModeOfInheritance.png',
      units = 'in',
      width = 8,
      height = 5,
      res = 300)
-ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
+ggplot(display.df, aes(x = variable,
+                       y = value,
+                       fill = variable)) +
     geom_bar(stat = 'identity') +
     facet_grid(~mode_of_inheritance) +
     geom_text(aes(y = value, label = value),
@@ -848,12 +862,16 @@ display.df <- grand.data %>%
     NotSure = sum(are_you_not_sure_who_explained_the_medial_aspects_of_nf1_to_you.))
 display.df <- melt(display.df, 'mode_of_inheritance')
 
+levels(display.df$variable) <- c('Doctor','Genetic Counselor','Family Members','No One','Not Sure')
+
 tiff(filename = '../images/MedicalExplanationByModeOfInheritance.png',
      units = 'in',
      width = 8,
      height = 5,
      res = 300)
-ggplot(display.df, aes(x = variable, y = value, fill = variable)) +
+ggplot(display.df, aes(x = reorder(variable, -value),
+                       y = value,
+                       fill = variable)) +
     geom_bar(stat = 'identity') +
     facet_grid(~mode_of_inheritance) +
     geom_text(aes(y = value, label = value),

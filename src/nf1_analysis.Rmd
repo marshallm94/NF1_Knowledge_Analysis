@@ -47,9 +47,17 @@ not.seen.gc <- subset(grand.data,
                       seen_gc == "No")
 
 # create subsets based on whether the respondent has NF1
-group.a <- subset(grand.data, group_id == "Group A")
-group.b <- subset(grand.data, group_id == "Group B")
-group.c <- subset(grand.data, group_id == "Group C")
+
+############# commenting out for edits to labels for paper submission #############
+#group.a <- subset(grand.data, group_id == "Group A")
+#group.b <- subset(grand.data, group_id == "Group B")
+#group.c <- subset(grand.data, group_id == "Group C")
+##################################################################################
+
+unaffected <- subset(grand.data, group_id == "Unaffected")
+other_parent_affected <- subset(grand.data, group_id == "Other Parent Affected")
+affected <- subset(grand.data, group_id == "Affected")
+
 ```
 
 \pagebreak
@@ -916,6 +924,47 @@ ggpaired(display.df,
 ```
 
 See the file AgeOfDiagnosisFamilialRelationship.png, in the images directory.
+
+```{r statistical_test_plot}
+summary_df <- grand.data %>% group_by(group_id) %>% summarise(average = mean(score))
+
+test.1 = summary_df[1:2,]
+test.1$Test = 'Test 1'
+
+test.2 = summary_df[c(1,3),]
+test.2$Test = 'Test 2'
+
+test.3 = summary_df[2:3,]
+test.3$Test = 'Test 3'
+
+summary_df <- rbind(test.1, test.2, test.3)
+
+# plot settings
+col = c('black','gray','black','white','gray','white')
+legend_col = c('black','grey','white')
+
+par(mar=c(2,5,2,5),
+    lwd=2)
+
+tiff(filename = '../images/StatisticalTests.png',
+     units = 'in',
+     width = 8,
+     height = 5,
+     res = 300)
+barplot(summary_df$average,
+        beside=TRUE,
+        ylim=c(0.5, 1),
+        col=col,
+        space=c(0,0,1,0,1,0),
+        axes=FALSE,
+        ylab='Average Survey Score',
+        main="Comparisons of NF1 Knowledge and Parental NF1 Status")
+legend('topright', legend=c('Affected','Other Parent Affected','Unaffected'), fill=legend_col)
+axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*100), "%"), las=2)
+text(x=1.5, y=0.85, "*", pos=3, cex=3)
+text(x=4.5, y=0.85, "*", pos=3, cex=3)
+dev.off()
+```
 
 # References
 

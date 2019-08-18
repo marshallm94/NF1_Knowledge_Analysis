@@ -92,7 +92,9 @@ age.sd <- sd(grand.data$age, na.rm = TRUE)
 
 After the above adjustments, the final data set contains 274 respondents, with an age ranging from `r age.range[1]` to `r age.range[2]` and a mean age of `r age.mean`. The standard deviation of the ages is `r age.sd`.
 
-## Testing Methodology
+## Approach 1
+
+### Testing Methodology
 
 In order to assess the first hypothesis of the study, to determine whether parental NF1 knowledge is influenced by the parent having a personal diagnosis of NF1, respondents were asked whether they or their affected child's other parent has NF1. This split the respondents into three groups:
 
@@ -106,7 +108,9 @@ In order to assess the first hypothesis of the study, to determine whether paren
 
 Originally, since we (myself and the PI of the study) knew we wanted to compare each of the three groups to the other two, I decided to forgo an initial ANOVA and go straight to the pairwise comparisons. Therefore, the three tests, and their accompanying hypotheses are as follows:
 
-1. Test 1 hypothesis: The "Unaffected"" group and the "Other Parent Affected" group do not have the same mean NF1 knowledge score, as measured by the knowledge questionaire.
+\hfill
+
+1. Test 1 hypothesis: The "Unaffected" group and the "Other Parent Affected" group do not have the same mean NF1 knowledge score, as measured by the knowledge questionaire.
     * $H_0:~\mu_{unaffected} = \mu_{other~parent~affected}$
     * $H_a:~\mu_{unaffected} \ne \mu_{other~parent~affected}$
     
@@ -117,10 +121,22 @@ Originally, since we (myself and the PI of the study) knew we wanted to compare 
 3. Test 3 hypothesis: The "Other Parent Affected" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is greater than that of the "Affected" group.
     * $H_0:~\mu_{other~parent~affected} \leq \mu_{affected}$
     * $H_a:~\mu_{other~parent~affected} > \mu_{affected}$
+
+\hfill
     
 Although the variance of test scores are very close to each other, the sample sizes are not (see *Table 1. Study Aim 1: Sample Statistics*), leading to the choice of Welch's *t*-test as the statistical test to be used.
 
-These three tests, combined with the test for the second study aim, which uses Welch's *t*-test for the same reasons as mentioned above (see *Table 2. Study Aim 2: Sample Statistics*), created a total of 4 statistical tests. In order to control the Family-Wise Type I error rate, the original significance level ($\alpha$ = `r alpha`) was adjusted using the Bonferroni Correction, reducing the level of statistical significance to $\alpha_{adj}$ = `r adj.alpha`.
+The second hypothesis of the study, to determine whether parental knowledge of NF1 can be increased by exposure to genetic counseling, was also tested using Welch's *t*-test for the same reasons as mentioned above (see *Table 2. Study Aim 2: Sample Statistics*). The hypothesis for this test are below.
+
+\hfill
+
+4. Test 4 hypothesis: The mean NF1 knowledge score, as measured by the knowledge questionaire, of those who have had exposure to genetic counseling is greater than that of those who have not had exposure to genetic counseling.
+    * $H_0:~\mu_{seen~GC} \leq \mu_{not~seen~GC}$
+    * $H_a:~\mu_{seen~GC} > \mu_{not~seen~GC}$
+
+\hfill
+
+In order to control the Family-Wise Type I error rate, the original significance level ($\alpha$ = `r alpha`) was adjusted using the Bonferroni Correction, reducing the level of statistical significance to $\alpha_{adj}$ = `r adj.alpha`.
 
 ```{r group_summary_table}
 # study aim 1
@@ -149,13 +165,11 @@ knitr::kable(summary.df,
              caption = "Study Aim 2: Sample Statistics")
 ```
 
-\pagebreak
-
 This brings us to the tests for the first study aim.
 
-## Study Aim 1 - Parental knowledge of NF1 is influenced by having a personal diagnosis of NF1.
+### Study Aim 1 - Parental knowledge of NF1 is influenced by having a personal diagnosis of NF1.
 
-### Test 1
+#### Test 1
 
 * $H_0:$ The "Unaffected" group has the same mean NF1 knowledge score, as measured by the knowledge questionaire, as the "Other Parent Affected" group.
 
@@ -163,173 +177,169 @@ This brings us to the tests for the first study aim.
 
 \hfill
 
-```{r}
+```{r test_1}
+if (save_images) {
+    images_dir <- '../images/'
+    if (!file.exists(images_dir)) {
+        dir.create(images_dir)
+    }
+    filename <- 'UnaffectedvsOtherParentAffected.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
 # welch's t-test
 test.1.results <- t.test(unaffected$score, other.parent.affected$score, var.equal = FALSE, alternative = 'two.sided')
-
 test.1.data <- rbind.data.frame(unaffected, other.parent.affected)
 
-subtitle <- paste("Mean's of each group displayed as vertical lines: 'Unaffected' Group =", round(mean(unaffected$score), 4), "|", "'Other Parent Affected' Group =", round(mean(other.parent.affected$score), 4))
+subtitle <- paste("Mean's of each group displayed as vertical lines: Unaffected Group =", round(mean(unaffected$score), 4), "|", "Other Parent Affected Group =", round(mean(other.parent.affected$score), 4))
 
-#tiff(filename = '../images/GroupAvsGroupB.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#    res = 300)
 ggplot(test.1.data, aes(score, fill = group_id)) +
     geom_density(alpha = 0.5) +
-    geom_vline(xintercept = mean(unaffected$score), color = 'darkgreen') +
-    geom_vline(xintercept = mean(other.parent.affected$score), color = 'orange') +
+    geom_vline(xintercept = mean(unaffected$score), color = 'orange') +
+    geom_vline(xintercept = mean(other.parent.affected$score), color = 'darkgreen') +
     theme(legend.position="bottom") +
     theme(legend.title=element_blank()) +
     scale_fill_manual(values = c('darkgreen','orange')) +
-    ggtitle("'Unaffected' Group vs. 'Other Parent Affected' Group",
+    ggtitle("Unaffected Group vs. Other Parent Affected Group",
             subtitle = subtitle) +
     theme(plot.subtitle=element_text(size=8, face="italic", color="black")) +
     xlab("Test Score") +
     ylab("Density")
-#dev.off()
 
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 print(paste("Test 1 p value =", test.1.results$p.value))
 ```
 
 Welch's two-tailed $t$-Test returns the above p value, with which we fail to reject the null hypothesis.
 
-See the file GroupAvsGroupB.png, in the images directory.
+\pagebreak
+
+#### Test 2
+
+* $H_0:$ The "Unaffected" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is less than or equal to that of the "Other Parent Affected" group.
+
+* $H_a:$ The "Unaffected" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is greater than that of the "Affected" group.
 
 \hfill
 
-## Test 2
-
-* $H_0:$ Respondents in Group A do not have a higher average test score than respondents in Group C.
-
-* $H_a:$ Respondents in Group A have a higher average test score than respondents in Group C.
-
-\hfill
-
-```{r}
+```{r test_2}
+if (save_images) {
+    filename <- 'UnaffectedvsAffected.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
 # welch's t-test
 test.2.results <- t.test(unaffected$score, affected$score, var.equal = FALSE, alternative = 'greater')
-
 test.2.data <- rbind.data.frame(unaffected, affected)
 
-subtitle <- paste("Mean's of each group displayed as vertical lines: Group A =", round(mean(unaffected$score), 4), "|", "Group C =", round(mean(affected$score), 4))
+subtitle <- paste("Mean's of each group displayed as vertical lines: Unaffected Group =", round(mean(unaffected$score), 4), "|", "Affected Group =", round(mean(affected$score), 4))
 
-#tiff(filename = '../images/GroupAvsGroupC.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
 ggplot(test.2.data, aes(score, fill = group_id)) +
     geom_density(alpha = 0.5) +
-    geom_vline(xintercept = mean(unaffected$score), color = 'darkgreen') +
+    geom_vline(xintercept = mean(unaffected$score), color = 'orange') +
     geom_vline(xintercept = mean(affected$score), color = 'purple') +
     theme(legend.position="bottom") +
     theme(legend.title=element_blank()) +
-    scale_fill_manual(values = c('darkgreen','purple')) +
-    ggtitle("Group A vs. Group C",
+    scale_fill_manual(values = c('purple','orange')) +
+    ggtitle("Unaffected Group vs. Affected Group",
             subtitle = subtitle) +
+    theme(plot.subtitle=element_text(size=8, face="italic", color="black")) +
     xlab("Test Score") +
     ylab("Density")
-#dev.off()
 
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 print(paste("Test 2 p value =", test.2.results$p.value))
 ```
 
-Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
-
-See the file GroupAvsGroupC.png, in the images directory.
-
-\hfill
-
-## Test 3
-
-* $H_0:$ Respondents in Group B do not have a higher average test score than respondents in Group C.
-
-* $H_a:$ Respondents in Group B have a higher average test score than respondents in Group C.
-
-\hfill
-
-```{r}
-# welch's t-test
-test.3.results <- t.test(other.parent.affected$score, affected$score, var.equal = FALSE, alternative = 'greater')
-
-test.3.data <- rbind.data.frame(other.parent.affected, affected)
-
-subtitle <- paste("Mean's of each group displayed as vertical lines: Group B =", round(mean(other.parent.affected$score), 4), "|", "Group C =", round(mean(affected$score), 4))
-
-#tiff(filename = '../images/GroupBvsGroupC.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
-ggplot(test.3.data, aes(score, fill = group_id)) +
-    geom_density(alpha = 0.5) +
-    geom_vline(xintercept = mean(other.parent.affected$score), color = 'orange') +
-    geom_vline(xintercept = mean(affected$score), color = 'purple') +
-    theme(legend.position="bottom") +
-    theme(legend.title=element_blank()) +
-    scale_fill_manual(values = c('orange','purple')) +
-    ggtitle("Group B vs. Group C",
-            subtitle = subtitle) +
-    xlab("Test Score") +
-    ylab("Density")
-#dev.off()
-
-print(paste("Test 3 p value =", test.3.results$p.value))
-```
-
-Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
-
-See the file GroupBvsGroupC.png, in the images directory.
+Welch's one-sided *t*-test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, $H_0$ is rejected in favor $H_a$.
 
 \pagebreak
 
-# Study Aim 2 - Does exposure to genetic counseling affect knowledge of NF1?
+#### Test 3
 
-## Test 4
+* $H_0:$ The "Other Parent Affected" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is less than or equal to that of the "Affected" group.
 
-* $H_0:$ Respondents who have seen a genetic counselor do not have a higher average test score than those that have not seen a genetic counselor.
-
-* $H_a:$ Respondents who have seen a genetic counselor have a higher average test score than those that have not seen a genetic counselor
+* $H_a:$ The "Other Parent Affected" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is greater than that of the "Affected" group.
 
 \hfill
 
-```{r}
-tiff(filename = '../images/GeneticCounselingExposure.png',
-     units = 'in',
-     width = 8,
-     height = 5,
-     res = 300)
-par(mar=c(4.5,4.1,4.1,2.1))
-boxplot(score ~ have_you_ever_met_with_a_genetic_counselor.,
-        data = grand.data,
-        ylim=c(0.5, 1),
-        yaxt = 'n')
-axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*100), "%"), las=2)
-title(main = 'Comparison of NF1 Knowledge and Exposure to Genetic Counseling',
-      ylab = 'Survey Score',
-      xlab = 'Have you ever met with a Genetic Counselor?',
-      font.main = 4,
-      font.lab = 2)
-text(x=1.5, y=0.95, "*p < 0.001", pos=3, cex=1, font = 4)
-dev.off()
+```{r test_3}
+if (save_images) {
+    filename <- 'OtherParentAffectedvsAffected.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+# welch's t-test
+test.3.results <- t.test(other.parent.affected$score, affected$score, var.equal = FALSE, alternative = 'greater')
+test.3.data <- rbind.data.frame(other.parent.affected, affected)
+
+subtitle <- paste("Mean's of each group displayed as vertical lines: Other Parent Affected Group =", round(mean(other.parent.affected$score), 4), "|", "Affected Group =", round(mean(affected$score), 4))
+
+ggplot(test.3.data, aes(score, fill = group_id)) +
+    geom_density(alpha = 0.5) +
+    geom_vline(xintercept = mean(other.parent.affected$score), color = 'darkgreen') +
+    geom_vline(xintercept = mean(affected$score), color = 'purple') +
+    theme(legend.position="bottom") +
+    theme(legend.title=element_blank()) +
+    scale_fill_manual(values = c('purple','darkgreen')) +
+    ggtitle("Other Parent Affected Group vs. Affected Group",
+            subtitle = subtitle) +
+    theme(plot.subtitle=element_text(size=8, face="italic", color="black")) +
+    xlab("Test Score") +
+    ylab("Density")
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+print(paste("Test 3 p value =", test.3.results$p.value))
 ```
 
-```{r}
+Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, $H_0$ is rejected in favor $H_a$.
+
+\pagebreak
+
+### Study Aim 2 - Parental knowledge of NF1 can be increased by exposure to genetic counseling.
+
+#### Test 4
+
+* $H_0:$ The "Seen GC" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is less than or equal to that of the "Not Seen GC" group.
+
+* $H_a:$ The "Seen GC" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is greater than that of the "Not Seen GC" group.
+
+\hfill
+
+```{r test_4}
+if (save_images) {
+    filename <- 'SeenGCvsNotSeenGC.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
 # welch's t-test
 test.4.results <- t.test(seen.gc$score, not.seen.gc$score, var.equal = FALSE,
        alternative = 'greater')
-
 test.4.data <- rbind.data.frame(seen.gc, not.seen.gc)
 
 subtitle <- paste("Mean's of each group displayed as vertical lines: Yes =", round(mean(seen.gc$score), 4), "|", "No =", round(mean(not.seen.gc$score), 4))
 
-#tiff(filename = '../images/SeenGCvsNotSeenGC.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
 ggplot(test.4.data, aes(score, fill = seen_gc)) +
     geom_density(alpha = 0.5) +
     geom_vline(xintercept = mean(not.seen.gc$score), color = '#F8766D') +
@@ -338,43 +348,84 @@ ggplot(test.4.data, aes(score, fill = seen_gc)) +
     theme(legend.title=element_blank()) +
     ggtitle("Have you seen a Genetic Counselor?",
             subtitle = subtitle) +
+    theme(plot.subtitle=element_text(size=8, face="italic", color="black")) +
     xlab("Test Score") +
     ylab("Density")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 print(paste("Test 4 p value =", test.4.results$p.value))
 ```
 
-Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, the null hypothesis is rejected in favor of the alternative.
+Welch's one-sided $t$-Test returns the above p value. Being well below the Bonferroni corrected significance level of `r adj.alpha`, $H_0$ is rejected in favor $H_a$.
 
-## ANOVA
+\pagebreak
 
-Since there are three groups that need to be tested (Affected, Other Parent Affected and Unaffected), starting with an ANOVA test will determine whether there is any evidence that at least one group mean is different from the others.
+## Approach 2
 
-Shown below, the ANOVA results show a highly significant result with a p value = 0.000511. Following this up with Tukey's Honestly Significant Difference (HSD) test, it is shown that two of the three pairwise comparisons have statistically significant different means - namely, that Affected group has a lower average score than both the other groups.
+Upon initial submission of the paper, the editor of the journal noted that the "statistical norms" of studies in the Journal of Genetic Counseling (JOGC) are to use an ANOVA followed by post-hoc pairwise comparisons should the ANOVA prove significant. In addition, should the paper be published in black and white, the above images wouldn't be as clear as they could be. With these suggestions in mind, the analysis and images were redone to fit the guidelines of the journal.
 
-```{r}
+### Study Aim 1 - Parental knowledge of NF1 is influenced by having a personal diagnosis of NF1.
+
+#### ANOVA
+
+Since there are three groups that need to be tested ("Affected", "Other Parent Affected" and "Unaffected"), an ANOVA test will determine whether there is evidence that at least one group mean is different from the others.
+
+* $H_0$: There is no difference in mean NF1 knowledge score, as measured by the knowledge questionaire, between the three groups ("Affected", "Other Parent Affected" and "Unaffected").
+
+* $H_a$: At least one group has a different mean NF1 knowledge score, as measured by the knowledge questionaire, than the other groups.
+
+```{r anova_plot}
+if (save_images) {
+    filename <- 'ANVOAComparison.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+par(mar=c(4.5,4.1,4.1,2.1))
+boxplot(score ~ group_id,
+        data = grand.data,
+        ylim=c(0.5, 1),
+        yaxt = 'n')
+title(main = 'One Way ANOVA',
+      ylab = 'Survey Score',
+      xlab = 'Group',
+      font.lab = 2)
+text(x=2, y=0.55, "*p < 0.001", pos=3, cex=1, font = 4)
+axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*100), "%"), las=2)
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+```
+
+```{r anova_test}
 anova.result <- aov(score ~ group_id,
                     data = grand.data)
 summary(anova.result)
-tukey.hsd.result<- TukeyHSD(anova.result)
-tukey.hsd.result$group_id
 ```
 
-```{r anova}
-tiff(filename = '../images/BoxWhiskers.png',
-     units = 'in',
-     width = 8,
-     height = 5,
-     res = 300)
-boxplot(score ~ group_id,
-        data = grand.data)
-title(main = 'One Way ANOVA: p value < 0.001',
-      ylab = 'Survey Score',
-      xlab = 'Group',
-      font.main = 4,
-      font.lab = 2)
-dev.off()
+The one way ANOVA, *F*(2, 271) = 7.794, *p* = 0.000511, shows that there is ample evidence for the alternate hypothesis, which is accepted and followed up with the pairwise comparisons.
+
+\pagebreak
+
+#### Tukey's HSD
+
+Following the ANOVA result with Tukey's Honestly Significant Difference (HSD) test, it is shown that the "Affected" group has a significantly lower NF1 knowledge score, as measure by the knowledge questionaire, than the other two groups. A significant difference between the "Unaffected" and "Other Parent Affected" groups was not found.
+
+```{r tukey_hsd}
+tukey.hsd.result<- TukeyHSD(anova.result)
+
+knitr::kable(tukey.hsd.result$group_id[,4],
+             caption = 'Tukey HSD Results',
+             col.names = '(Adj.) P value',
+             label = 'test')
 ```
 
 ```{r pairwise_comparisons}
@@ -391,18 +442,21 @@ test.3$Test = 'Test 3'
 
 summary_df <- rbind(test.1, test.2, test.3)
 
+if (save_images) {
+    filename <- 'PairwiseComparison.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 # plot settings
 col = c('black','gray','black','white','gray','white')
 legend_col = c('black','grey','white')
 
-par(mar=c(2,5,2,5),
-    lwd=2)
-
-tiff(filename = '../images/PairwiseComparison.png',
-     units = 'in',
-     width = 8,
-     height = 5,
-     res = 300)
+#par(mar=c(2,5,2,5),
+#    lwd=2)
 barplot(summary_df$average,
         beside=TRUE,
         ylim=c(0.5, 1),
@@ -410,15 +464,63 @@ barplot(summary_df$average,
         space=c(0,0,1,0,1,0),
         axes=FALSE,
         ylab='Average Survey Score',
-        main="Pairwise Comparisons of NF1 Knowledge and Parental NF1 Status")
-legend('topright', legend=c('Affected','Other Parent Affected','Unaffected'), fill=legend_col)
+        main="Pairwise Comparisons of NF1 Knowledge and Parental NF1 Status",
+        font.lab = 2)
+legend('topright', legend=c('Affected','Other Parent Affected','Unaffected'), fill=legend_col, cex=0.75)
 axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*100), "%"), las=2)
 text(x=1.0, y=0.85, "*p = 0.004", pos=3, cex=1, font = 4)
 text(x=4.0, y=0.85, "*p < 0.001", pos=3, cex=1, font = 4)
-dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 ```
 
-See the file SeenGCvsNotSeenGC.png, in the images directory.
+\pagebreak
+
+### Study Aim 2 - Parental knowledge of NF1 can be increased by exposure to genetic counseling.
+
+The testing methodology for the second study aim remained the same for both approaches, however the plot was changed to display the findings in a more traditional manner (hypotheses reproduced below)
+
+\hfill
+
+* $H_0:$ The "Seen GC" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is less than or equal to that of the "Not Seen GC" group.
+
+* $H_a:$ The "Seen GC" group has a mean NF1 knowledge score, as measured by the knowledge questionaire, that is greater than that of the "Not Seen GC" group.
+
+\hfill
+
+```{r}
+if (save_images) {
+    filename <- 'GeneticCounselingExposure.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
+par(mar=c(4.5,4.1,4.1,2.1))
+boxplot(score ~ have_you_ever_met_with_a_genetic_counselor.,
+        data = grand.data,
+        ylim=c(0.5, 1),
+        yaxt = 'n')
+axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*100), "%"), las=2)
+title(main = 'Comparison of NF1 Knowledge and Exposure to Genetic Counseling',
+      ylab = 'Survey Score',
+      xlab = 'Have you ever met with a Genetic Counselor?',
+      font.main = 4,
+      font.lab = 2)
+text(x=1.5, y=0.95, "*p < 0.001", pos=3, cex=1, font = 4)
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+```
+
+\hfill
 
 ```{r cronbachs_alpha, include=FALSE}
 quiz.questions <- c('one_half_or_50._of_genetic_information_is_passed_down_from_mother_to_child',
@@ -469,15 +571,15 @@ quiz.df <- grand.data[, quiz.questions]
 cronbachs <- cronbach.alpha(quiz.df)$alpha
 ```
 
-# Cronbach's Alpha
+## Cronbach's Alpha
 
-Cronbach's alpha is a statistic used to measure the reliability of a set of test items, or more specifically, how well a set of test items (questions) measures the underlying concept which the test is attempting to assess. In the context, of this thesis, the Cronbach's Alpha can be interpreted as a numeric summary of how well the knowledge based questions assess a respondents true knowledge level of NF1.
+Cronbach's alpha is a statistic used to measure the reliability of a set of test items, or more specifically, how well a set of test items (questions) measures the underlying concept which the test is attempting to assess. In the context of this thesis, Cronbach's Alpha can be interpreted as a numeric summary of how well the knowledge based questions assess a respondents true knowledge level of NF1.
 
 Using 43 quiz questions returned a Cronbach's Alpha value of `r cronbachs`.
 
 \pagebreak
 
-# Test Limitations
+## Test Limitations
 
 As with any statistical test, there are limitations imposed by the methods I have chosen to use. In contrast to Student's $t$-test, Welch's $t$-test does not assume that the variances of the two samples are equal. However, the assumption that the data is Normally distributed is maintained.
 

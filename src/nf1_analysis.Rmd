@@ -579,7 +579,9 @@ Using 43 quiz questions returned a Cronbach's Alpha value of `r cronbachs`.
 
 \pagebreak
 
-## Test Limitations
+## Statistical Theory: Approach 1 vs. Approach 2
+
+
 
 As with any statistical test, there are limitations imposed by the methods I have chosen to use. In contrast to Student's $t$-test, Welch's $t$-test does not assume that the variances of the two samples are equal. However, the assumption that the data is Normally distributed is maintained.
 
@@ -615,30 +617,20 @@ The problem of multiple comparisons is an area of active research and, seeing as
 
 A total of 5 statistical tests were performed, broken into two “families” of tests, one family for the first study aim and one family for the second study aim. The first family of tests consisted of a one way ANOVA test followed by 3 post hoc pairwise comparisons. The second “family” consisted of one test - Welch’s one-sided t-test. An important note is that the number of tests in a family can increase the Family-Wise Type I error rate. Tukey’s HSD, the method used in this study to control the Family-Wise Type I error rate,  is one of many possible solutions to the problem of multiple comparisons and, "there is no universally accepted approach for dealing with the problem of multiple comparisons" (McDonald, 2014)
 
-
 \pagebreak
-
-
-
-
-
-
-
-
-
 
 # Data Visualizations
 
-
-
-# Demographic Analysis
-
 ```{r proportion_of_respondents_who_have_nf1}
-#tiff(filename = '../images/HaveNF1.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'HaveNF1Percentage.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(grand.data, aes(do_you_have_nf1., fill = do_you_have_nf1.)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
     geom_text(aes(y = ((..count..)/sum(..count..)),
@@ -653,7 +645,11 @@ ggplot(grand.data, aes(do_you_have_nf1., fill = do_you_have_nf1.)) +
           axis.text.x = element_blank()) +
     ggtitle("Do you have have NF1?") +
     ylab("Proportion")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 
 result <- table(grand.data$do_you_have_nf1.)
@@ -662,16 +658,18 @@ knitr::kable(result,
              col.names = c('Response','Count'))
 ```
 
-The plot associated with the above table is HaveNF1.png, in the images directory.
-
 \hfill
 
 ```{r proportion_of_respondents_who_have_met_a_gc}
-#tiff(filename = '../images/MetGC.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'PercentageMetGC.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
                        fill = have_you_ever_met_with_a_genetic_counselor.)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
@@ -687,15 +685,17 @@ ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
           axis.text.x = element_blank()) +
     ggtitle("Have you ever met with a Genetic Counselor?") +
     ylab("Proportion")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 result <- table(grand.data$have_you_ever_met_with_a_genetic_counselor.)
 knitr::kable(result,
              caption = "Have you ever met with a Genetic Counselor?",
              col.names = c('Response','Count'))
 ```
-
-The plot associated with the above table is MetGC.png, in the images directory.
 
 \hfill
 
@@ -707,11 +707,15 @@ display.df <- as.data.frame(grand.data %>%
     arrange(desc(n))) %>%
     mutate(employment_status = factor(employment_status, employment_status))
 
-#tiff(filename = '../images/EmploymentStatusDistribution.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'EmploymentStatusDistribution.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(display.df, aes(x = reorder(employment_status, -n),
                        y = n,
                        fill = employment_status)) +
@@ -727,7 +731,11 @@ ggplot(display.df, aes(x = reorder(employment_status, -n),
           axis.text.x = element_blank()) +
     ggtitle("Employment Status") +
     ylab("Proportion")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 result <- table(grand.data$employment_status)
 knitr::kable(result,
@@ -735,18 +743,20 @@ knitr::kable(result,
              col.names = c('Response','Count'))
 ```
 
-The plot associated with the above table is EmploymentStatusDistribution.png, in the images directory.
-
 \pagebreak
 
 ```{r gender}
 grand.data$gender <- sub("^$", "Unknown", grand.data$gender)
 
-#tiff(filename = '../images/GenderDistribution.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'GenderDistribution.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(grand.data, aes(gender,
                        fill = gender)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) +
@@ -762,15 +772,17 @@ ggplot(grand.data, aes(gender,
           axis.text.x = element_blank()) +
     ggtitle("Gender") +
     ylab("Proportion")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 result <- table(grand.data$gender)
 knitr::kable(result,
              caption = "Gender",
              col.names = c('Response','Count'))
 ```
-
-The plot associated with the above table is GenderDistribution.png, in the images directory.
 
 \hfill
 
@@ -782,11 +794,15 @@ display.df <- as.data.frame(grand.data %>%
     arrange(desc(n))) %>%
     mutate(ethnicity = factor(ethnicity, ethnicity))
 
-#tiff(filename = '../images/EthnicityDistribution.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'EthnicityDistribution.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(display.df, aes(x = reorder(ethnicity, -n),
                        y = n,
                        fill = ethnicity)) +
@@ -802,7 +818,11 @@ ggplot(display.df, aes(x = reorder(ethnicity, -n),
           axis.text.x = element_blank()) +
     ggtitle("Ethnicity") +
     ylab("Proportion")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 
 result <- table(grand.data$ethnicity)
@@ -810,8 +830,6 @@ knitr::kable(result,
              caption = "Ethnicity",
              col.names = c('Response \t','Count'))
 ```
-
-The plot associated with the above table is EthnicityDistribution.png, in the images directory.
 
 \pagebreak
 
@@ -840,11 +858,15 @@ de.novo <- display.df[display.df$mode_of_inheritance == 'De Novo', ] %>%
                             
 display.df <- rbind(de.novo, inherited)
 
-#tiff(filename = '../images/EducationDistribution.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'EducationDistribution.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(display.df, aes(x = educational_background,
                        y = percentage,
                        fill = educational_background)) +
@@ -861,7 +883,11 @@ ggplot(display.df, aes(x = educational_background,
           axis.text.x = element_blank()) +
     ggtitle("Educational Background") +
     ylab("Proportion")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 result <- table(grand.data$educational_background)
 knitr::kable(result[2:length(result)],
@@ -869,11 +895,9 @@ knitr::kable(result[2:length(result)],
              col.names = c('Response \t','Count'))
 ```
 
-The plot associated with the above table is EducationDistribution.png, in the images directory.
+\pagebreak
 
-\hfill
-
-It is important to note that the answers to the below question, "What specialists does your affected child see?" are not mutually exclusive - children who see a Neurologist may have seen an Oncologist and a Geneticist as well. 
+It is important to note that the answers to the below question, "What specialists does your affected child see?" are *not* mutually exclusive - children who see a Neurologist may have seen an Oncologist and a Geneticist as well. 
 
 \hfill
 
@@ -906,11 +930,15 @@ inherited <- df.d[df.d$mode_of_inheritance != 'De Novo',] %>%
 
 df.d <- rbind(de.novo, inherited)
 
-#tiff(filename = '../images/SpecialistsByModeOfInheritance.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'SpecialistsByModeOfInheritcance.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(df.d, aes(x = reorder(variable, -value),
                  y = value,
                  fill = variable)) +
@@ -925,19 +953,25 @@ ggplot(df.d, aes(x = reorder(variable, -value),
     ggtitle("What specialists does your affected child see?",
             "Faceted by mode of inheritance") +
     ylab("Count")
-#dev.off()
-```
 
-See the file SpecialistsByModeOfInheritance.png, in the images directory.
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+```
 
 \hfill
 
 ```{r frequency_of_visits}
-#tiff(filename = '../images/FrequencyOfVisitsByModeOfInerheritance.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'FrequencyOfVisitsByModeOfInheritance.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(grand.data, aes(how_often_does_your_.oldest._child_see_an_nf_doctor.,
                        y = (..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))) +
     geom_bar(aes(fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
@@ -954,14 +988,16 @@ ggplot(grand.data, aes(how_often_does_your_.oldest._child_see_an_nf_doctor.,
           axis.text.x = element_blank()) +
     ggtitle("How often does your oldest child see a NF1 doctor?") +
     ylab("Proportion")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 result <- table(grand.data$how_often_does_your_.oldest._child_see_an_nf_doctor., grand.data$mode_of_inheritance)
 knitr::kable(result,
              caption = "How often does your oldest child see a NF1 doctor?")
 ```
-
-The plot associated with the above table is FrequencyOfVisitsByModeOfInerheritance.png, in the images directory.
 
 \pagebreak
 
@@ -971,11 +1007,15 @@ display.df <- grand.data %>%
     summarise(mean_score = mean(score))
 df.d <- melt(display.df, id.vars='how_often_does_your_.oldest._child_see_an_nf_doctor.')
 
-#tiff(filename = '../images/FrequencyOfVisitsAgainstQuizScore.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'FrequencyOfVisitsVsQuizScore.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(df.d, aes(x = how_often_does_your_.oldest._child_see_an_nf_doctor., y = value, fill = how_often_does_your_.oldest._child_see_an_nf_doctor.)) +
     geom_bar(stat = 'identity') +
     scale_y_continuous(labels = scales::percent) +
@@ -987,19 +1027,25 @@ ggplot(df.d, aes(x = how_often_does_your_.oldest._child_see_an_nf_doctor., y = v
           axis.title.x = element_blank()) +
     ggtitle("How often does your oldest child see a NF1 doctor?") +
     ylab("Mean Quiz Score")
-#dev.off()
-```
 
-See the file FrequencyOfVisitsAgainstQuizScore.png, in the images directory.
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+```
 
 \hfill
 
 ```{r mode_of_inheritance_vs_seen_gc}
-#tiff(filename = '../images/MetGCByModeOfInheritance.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'MetGCByModeOfInheritance.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
                        fill = have_you_ever_met_with_a_genetic_counselor.)) +
     geom_bar(aes(y = (..count..))) +
@@ -1016,19 +1062,25 @@ ggplot(grand.data, aes(have_you_ever_met_with_a_genetic_counselor.,
     ggtitle("Have you ever met with a Genetic Counselor?",
             "Faceted by mode of inheritance") +
     ylab("Count")
-#dev.off()
-```
 
-See the file MetGCByModeOfInheritance.png, in the images directory.
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+```
 
 \hfill
 
 ```{r severity_symptoms}
-#tiff(filename = '../images/SeverityOfSymptomsByModeOfInheritance.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'SeverityOfSymptomsByModeOfInheritance.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(grand.data,
        aes(how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1.,
            y = (..count..)/sapply(PANEL, FUN=function (x) sum(count[PANEL == x])))) +
@@ -1047,18 +1099,20 @@ ggplot(grand.data,
     ggtitle("How would you describe the severity of symptoms\nof your oldest child with NF1?",
             "Faceted by mode of inheritance") +
     ylab("Proportion")
-#dev.off()
+
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
 
 result <- table(grand.data$how_would_you_describe_the_severity_of_symptoms_of_your_.oldest._child_with_nf1., grand.data$mode_of_inheritance)
 knitr::kable(result,
              caption = "How would you describe the severity of symptoms of your oldest child with NF1?")
 ```
 
-The plot associated with the above table is SeverityOfSymptomsByModeOfInheritance.png, in the images directory.
+\pagebreak
 
-\hfill
-
-Similar to one of the previous plots, it is important to note that the answers to the below question, "Where do you obtain knowledge regarding NF1 should you have questions?" are not mutually exclusive - parents who ask their doctor might also reference online sources.
+Similar to the "What specialists does your affected child see?" plot, it is important to note that the answers to the below question, "Where do you obtain knowledge regarding NF1 should you have questions?" are not mutually exclusive - parents who ask their doctor might also reference online sources.
 
 \hfill
 
@@ -1087,11 +1141,15 @@ inherited <- display.df[display.df$mode_of_inheritance != 'De Novo',] %>%
 
 display.df <- rbind(de.novo, inherited)
 
-#tiff(filename = '../images/ObtainKnowledgeByModeOfInheritance.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'ObtainKnowledgeByModeOfInheritance.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(display.df, aes(x = variable,
                        y = value,
                        fill = variable)) +
@@ -1106,10 +1164,12 @@ ggplot(display.df, aes(x = variable,
     ggtitle("Where do you obtain knowledge regarding NF1 should you have questions?",
             "Faceted by mode of inheritance") +
     ylab("Count")
-#dev.off()
-```
 
-See the file ObtainKnowledgeByModeOfInheritance.png, in the images directory.
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+```
 
 \hfill
 
@@ -1126,11 +1186,15 @@ display.df <- melt(display.df, 'mode_of_inheritance')
 
 levels(display.df$variable) <- c('Doctor','Genetic Counselor','Family Members','No One','Not Sure')
 
-#tiff(filename = '../images/MedicalExplanationByModeOfInheritance.png',
-#     units = 'in',
-#     width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'MedicalExplanationByModeOfInheritance.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggplot(display.df, aes(x = reorder(variable, -value),
                        y = value,
                        fill = variable)) +
@@ -1145,10 +1209,12 @@ ggplot(display.df, aes(x = reorder(variable, -value),
     ggtitle("Who explained the medical aspects of NF1 to you?",
             "Faceted by mode of inheritance") +
     ylab("Count")
-#dev.off()
-```
 
-See the file MedicalExplanationByModeOfInheritance.png, in the images directory.
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+```
 
 \hfill
 
@@ -1159,11 +1225,15 @@ colnames(display.df) <- c('Parent','Child')
 display.df <- display.df[display.df$Parent != 'Unknown',]
 display.df$Parent <- as.numeric(display.df$Parent)
 
-#tiff(filename = '../images/AgeOfDiagnosisFamilialRelationship.png',
-#    units = 'in',
-#    width = 8,
-#     height = 5,
-#     res = 300)
+if (save_images) {
+    filename <- 'AgeOfDiagnosisFamilialRelationship.png'
+    tiff(filename = paste(images_dir, filename, sep = ""),
+    units = 'in',
+    width = 8,
+    height = 5,
+    res = 300)
+}
+
 ggpaired(display.df,
          cond1 = 'Parent',
          cond2 = 'Child',
@@ -1174,10 +1244,12 @@ ggpaired(display.df,
          ggtheme = theme_gray()) +
   theme(legend.position = 'none') +
   ggtitle("Familial Relationship: Age of Diagnosis")
-#dev.off()
-```
 
-See the file AgeOfDiagnosisFamilialRelationship.png, in the images directory.
+if (save_images) {
+    dev.off()
+    print(paste("Open", paste(images_dir, filename, sep = ""), "to see the associated plot."))
+}
+```
 
 # References
 

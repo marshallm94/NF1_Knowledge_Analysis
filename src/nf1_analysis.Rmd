@@ -1,12 +1,12 @@
 ---
 title: "NF1 Thesis Analysis"
 author: "Marshall McQuillen"
-date: "12/10/2018"
+date: "8/19/2019"
 output: 
   pdf_document: 
     latex_engine: xelatex
     toc: true
-    toc_depth: 4
+    toc_depth: 2
 ---
 
 ```{r, include=FALSE, eval=TRUE}
@@ -124,7 +124,7 @@ Originally, since we (myself and the PI of the study) knew we wanted to compare 
 
 \hfill
     
-Although the variance of test scores are very close to each other, the sample sizes are not (see *Table 1. Study Aim 1: Sample Statistics*), leading to the choice of Welch's *t*-test as the statistical test to be used.
+Although the variance of test scores are very close to each other, the sample sizes are not (see *Table 1. Study Aim 1: Sample Statistics*), leading to the choice of Welch's *t*-test as the statistical test to be used since it doesn't assume equal variances nor equal sample sizes.
 
 The second hypothesis of the study, to determine whether parental knowledge of NF1 can be increased by exposure to genetic counseling, was also tested using Welch's *t*-test for the same reasons as mentioned above (see *Table 2. Study Aim 2: Sample Statistics*). The hypothesis for this test are below.
 
@@ -581,43 +581,48 @@ Using 43 quiz questions returned a Cronbach's Alpha value of `r cronbachs`.
 
 ## Statistical Theory: Approach 1 vs. Approach 2
 
+The fact that both the above approaches produced the same result is a testament to the significance of the findings, however I believe it is worth diving into the theory of the two approaches, and in particular arguing that a one way ANOVA *F*-test was unnecessary in this case.
 
+The null hypothesis of a one way ANOVA *F*-test is that the means of all groups tested are the same. That is,
 
-As with any statistical test, there are limitations imposed by the methods I have chosen to use. In contrast to Student's $t$-test, Welch's $t$-test does not assume that the variances of the two samples are equal. However, the assumption that the data is Normally distributed is maintained.
+$$H_o:\mu_1 = \mu_2 = \mu_3 \cdots \mu_k$$
 
-The Shapiro-Wilk test is a statistical test used to determine whether that particular sample came from a population that is normally distributed. The null hypothesis of this test is that the sample came from a Normally distributed population, the alternative therefore being that the sample did not originate from a Normally distributed population. As shown in the table below, all samples have a "low" p value from the Shapiro-Wilk test, groups B and C being the only ones that are above the Bonferroni adjusted significance threshold.
+Therefore, the alternate hypothesis of one way ANOVA is that *at least two* group means are unequal. That is,
 
-```{r}
-unaffected.normality <- shapiro.test(unaffected$score)$p.value
-other.parent.affected.normality <- shapiro.test(other.parent.affected$score)$p.value
-affected.normality <- shapiro.test(affected$score)$p.value
-seen.gc.normality <- shapiro.test(seen.gc$score)$p.value
-not.seen.gc.normality <- shapiro.test(not.seen.gc$score)$p.value
+$$H_a:at~least~one~pair~\mu_j \ne \mu_{j'}$$
 
-summary.df <- data.frame(PValue = c(unaffected.normality,
-                                    other.parent.affected.normality,
-                                    affected.normality,
-                                    seen.gc.normality,
-                                    not.seen.gc.normality))
+Should a one way ANOVA *F*-test prove significant and the alternate hypothesis be accepted, the natural next question becomes, "Which pair(s) have different means?"
 
-rownames(summary.df) <- c('Group A','Group B','Group C','Seen Genetic Counselor','Not Seen Genetic Counselor')
-knitr::kable(summary.df,
-             caption = 'Shapiro-Wilk Test P-Values')
+This is where post hoc comparisons come into play, such as the Bonferroni Correction, Fisher's Least Significant Difference (LSD) test and Tukey's Honestly Significant Difference (HSD) test (used in Approach 2), to name a few. While diving into the details of each of these methods is outside the scope of this paper and deserves focused research, their general purpose is to control the family-wise error rate (FWER), sometimes referred to as the experimentwise-alpha.
+
+When one decides to correct for multiple comparisons, defining the bounds of a "family" of statistical tests has a large impact on the whether a particular test is deemed "significant," and, "there is no firm rule on this."$^{[1]}$ Some texts suggests that a "family" of tests are all tests, "conducted on the same data."$^{[2]}$ However, if this is the definition of "family" that is used, than post hoc tests inherently do *not* control the FWER by definition. Post hoc (latin: *After this*) tests, as the name implies, are performed after an initial test for significance is conducted (ANOVA in this and most cases) and ensure that the probability of a false positive among *any of the post hoc tests* does not exceed a certain threshold. Since there isn't a post hoc test that retroactively adjusts the significance level needed for the omnibus ANOVA to be deemed significant, post hoc procedures can only be said to control the FWER in so far as the "family" is defined as the pairwise post hoc tests. With this in mind, the ANOVA followed by post hoc tests method, the method used in Approach 2, has:
+
+\begin{align}
+FWER & = probability~of~at~least~one~Type~I~error~in~a~family~of~hypothesis~tests \\
+& = P(H_a~Anova~falsely~accepted) + P(H_a~post~hoc~family~falsely~accepted) \\
+& = 0.05 + 0.05 \\
+& = 0.1
+\end{align}
+
+...if a "family" is defined as all tests that are conducted on the same sample.
+
+In addition, in Approach 2, the adjustment to the significance level isn't extended to the test for the second study aim. Therefore, if included in the above calculation, the $FWER = 0.15$ after adding on the additional $0.05$ for the test that looks at the second study aim.
+
+Conversely, since we (myself and the PI) knew at the outset that we wanted to compare the means of each of the three groups, ("Affected", "Other Parent Affected" and "Unaffected"), in addition to the "Met GC" vs. "Not Met GC" groups, Approach 1 seemed more reasonable. By defining a "family" of tests as all those that are conducted on the same sample, applying the Bonferroni Correction to all 4 tests gives each test equal weight and does in fact control the FWER at 0.05. Although the Bonferroni Correction is considered a convservative approach, this is outside the scope of this paper (again, deserves and has many of it's own papers), the significant levels only become overly conservative when $k>4$.
+
+\hfill
+
+```{r bonferroni_correction_demo}
+x <- seq(1, 20, 1)
+y <- alpha / x
+if (!save_images) {
+    qplot(x, y, xlab = 'K', main = "Significance level needed to determine significance in family of K tests", ylab = 'Significance Level')
+}
 ```
 
-This, however, leads to another important topic, the problem of multiple comparisons. When one decides to correct for multiple comparisons, as I have done here using the Bonferroni Correction, the goal is to reduce the probability of a false positive. This practice *necessarily* increases the probability of a false negative. I adjusted the original significance level of 0.05 by accounting for the 4 statistical tests that addressed the study aims of this thesis. However, had I included the above 5 statistical tests that might fall under the heading of *Assumption Testing*, the adjusted significance level would fall to `r alpha/9`. Clearly, deciding where the bounds of a "family" of statistical tests begin and end has a large impact on the whether a particular test is deemed "significant," and, "there is no firm rule on this."$^{[1]}$
+\hfill
 
-The problem of multiple comparisons is an area of active research and, seeing as, "There is no universally accepted approach for dealing with the problem of multiple comparisons,"$^{[1]}$ deciding on the Bonferroni Correction was one of many possible solutions to the problem.
-
-
-
-
-
-
-
-A total of 5 statistical tests were performed, broken into two “families” of tests, one family for the first study aim and one family for the second study aim. The first family of tests consisted of a one way ANOVA test followed by 3 post hoc pairwise comparisons. The second “family” consisted of one test - Welch’s one-sided t-test. An important note is that the number of tests in a family can increase the Family-Wise Type I error rate. Tukey’s HSD, the method used in this study to control the Family-Wise Type I error rate,  is one of many possible solutions to the problem of multiple comparisons and, "there is no universally accepted approach for dealing with the problem of multiple comparisons" (McDonald, 2014)
-
-\pagebreak
+This last section barely scratched the surface of a few questions in statistical theory, however, as I said, this would have been out of place in the JOGC.
 
 # Data Visualizations
 
@@ -1253,4 +1258,6 @@ if (save_images) {
 
 # References
 
-[1] McDonald, J.H. 2014. Handbook of Biological Statistics (3rd ed.). Sparky House Publishing, Baltimore, Maryland.
+[1] McDonald, J.H. (2014). Handbook of Biological Statistics (3rd ed.). Sparky House Publishing, Baltimore, Maryland.
+
+[2] Privitera, G. (2012). Statistics for the behavioral sciences. Thousand Oaks, CA: SAGE, p.367.

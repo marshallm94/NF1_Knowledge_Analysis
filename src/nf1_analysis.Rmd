@@ -466,10 +466,11 @@ barplot(summary_df$average,
         ylab='Average Survey Score',
         main="Pairwise Comparisons of NF1 Knowledge and Parental NF1 Status",
         font.lab = 2)
-legend('topright', legend=c('Affected','Other Parent Affected','Unaffected'), fill=legend_col, cex=0.75)
+legend(x = 3.0, y = 1, legend=c('Self Affected','Other Parent Affected','Unaffected'), fill=legend_col, cex=0.75)
 axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*100), "%"), las=2)
 text(x=1.0, y=0.85, "*p = 0.004", pos=3, cex=1, font = 4)
 text(x=4.0, y=0.85, "*p < 0.001", pos=3, cex=1, font = 4)
+text(x=7.0, y=0.85, "p = 0.644", pos=3, cex=1, font = 3)
 
 if (save_images) {
     dev.off()

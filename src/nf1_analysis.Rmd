@@ -511,7 +511,6 @@ axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*
 title(main = 'Comparison of NF1 Knowledge and Exposure to Genetic Counseling',
       ylab = 'Survey Score',
       xlab = 'Have you ever met with a Genetic Counselor?',
-      font.main = 4,
       font.lab = 2)
 text(x=1.5, y=0.95, "*p < 0.001", pos=3, cex=1, font = 4)
 

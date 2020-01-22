@@ -42,6 +42,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(ggpubr))
 suppressPackageStartupMessages(library(ltm))
+suppressPackageStartupMessages(library(extrafont))
 
 # load & setup data
 grand.data <- read.csv("/Users/marshallmcquillen/Data_Science/NF1_Thesis/data/grand_data.csv")
@@ -380,7 +381,7 @@ Since there are three groups that need to be tested ("Affected", "Other Parent A
 
 ```{r anova_plot}
 if (save_images) {
-    filename <- 'ANVOAComparison.png'
+    filename <- 'ANOVAComparison.png'
     tiff(filename = paste(images_dir, filename, sep = ""),
     units = 'in',
     width = 8,
@@ -391,7 +392,9 @@ par(mar=c(4.5,4.1,4.1,2.1))
 boxplot(score ~ group_id,
         data = grand.data,
         ylim=c(0.5, 1),
-        yaxt = 'n')
+        yaxt = 'n',
+        xlab = NULL,
+        ylab = NULL)
 title(main = 'One Way ANOVA',
       ylab = 'Survey Score',
       xlab = 'Group',
@@ -455,6 +458,7 @@ if (save_images) {
 col = c('black','gray','black','white','gray','white')
 legend_col = c('black','grey','white')
 
+par(family = 'Times New Roman')
 #par(mar=c(2,5,2,5),
 #    lwd=2)
 barplot(summary_df$average,
@@ -466,7 +470,7 @@ barplot(summary_df$average,
         ylab='Average Survey Score',
         main="Pairwise Comparisons of NF1 Knowledge and Parental NF1 Status",
         font.lab = 2)
-legend(x = 3.0, y = 1, legend=c('Self Affected','Other Parent Affected','Unaffected'), fill=legend_col, cex=0.75)
+legend(x = 3.0, y = 1, legend=c('Self-Affected','Other Parent Affected','Unaffected'), fill=legend_col, cex=0.75)
 axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*100), "%"), las=2)
 text(x=1.0, y=0.85, "*p = 0.004", pos=3, cex=1, font = 4)
 text(x=4.0, y=0.85, "*p < 0.001", pos=3, cex=1, font = 4)
@@ -502,14 +506,17 @@ if (save_images) {
     res = 300)
 }
 
-par(mar=c(4.5,4.1,4.1,2.1))
+par(mar=c(4.5,4.1,4.1,2.1),
+    family = 'Times New Roman')
 boxplot(score ~ have_you_ever_met_with_a_genetic_counselor.,
         data = grand.data,
         ylim=c(0.5, 1),
-        yaxt = 'n')
+        yaxt = 'n',
+        xlab = NULL,
+        ylab = NULL)
 axis(side=2, at=pretty(seq(0.5, 1, 0.1)), labels=paste0(pretty(seq(0.5, 1, 0.1)*100), "%"), las=2)
-title(main = 'Comparison of NF1 Knowledge and Exposure to Genetic Counseling',
-      ylab = 'Survey Score',
+title(main = 'Relationship Between NF1 Knowledge and Exposure to Genetic Counseling',
+      ylab = 'NF1 Knowledge Score',
       xlab = 'Have you ever met with a Genetic Counselor?',
       font.lab = 2)
 text(x=1.5, y=0.95, "*p < 0.001", pos=3, cex=1, font = 4)

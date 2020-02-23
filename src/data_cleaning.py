@@ -89,7 +89,6 @@ def clean_age_column(df, column='at_what_age_were_you_diagnosed_with_nf1?'):
 
     return df_copy
 
-
 def convert_to_binary(df, columns):
 
     df_copy = df.copy()

@@ -106,9 +106,9 @@ def create_genetic_groups(df, group_colname='group_id'):
 	mask_b1 = df_copy['does_your_childs_other_parent_have_nf1?'] == "Yes"
 	mask_b2 = df_copy['do_you_have_nf1?'] == "No"
 
-	df_copy.loc[mask_a1 & mask_a2, group_colname] = 'Group A'
-	df_copy.loc[mask_b1 & mask_b2, group_colname] = 'Group B'
-	df_copy.loc[pd.isna(df_copy[group_colname]), group_colname] = "Group C"
+	df_copy.loc[mask_a1 & mask_a2, group_colname] = 'Unaffected'
+	df_copy.loc[mask_b1 & mask_b2, group_colname] = 'Other Parent Affected'
+	df_copy.loc[pd.isna(df_copy[group_colname]), group_colname] = "Affected"
 
 	return df_copy
 

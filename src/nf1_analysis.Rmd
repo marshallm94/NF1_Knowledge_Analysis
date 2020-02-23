@@ -1,5 +1,5 @@
 ---
-title: "NF1 Thesis Analysis"
+title: "NF1 Knowledge Analysis"
 author: "Marshall McQuillen"
 date: "8/19/2019"
 output: 
@@ -45,7 +45,7 @@ suppressPackageStartupMessages(library(ltm))
 suppressPackageStartupMessages(library(extrafont))
 
 # load & setup data
-grand.data <- read.csv("/Users/marshallmcquillen/Data_Science/NF1_Thesis/data/grand_data.csv")
+grand.data <- read.csv("/Users/marshallmcquillen/Data_Science/NF1_Knowledge_Analysis/data/grand_data.csv")
 grand.data$mode_of_inheritance <- ifelse(grand.data$does_your_childs_other_parent_have_nf1. == "No" & grand.data$do_you_have_nf1. == "No", "De Novo", "Inherited")
 
 # original significance level

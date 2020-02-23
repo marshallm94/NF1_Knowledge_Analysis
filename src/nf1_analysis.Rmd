@@ -467,7 +467,7 @@ barplot(summary_df$average,
         col=col,
         space=c(0,0,1,0,1,0),
         axes=FALSE,
-        ylab='Average Survey Score',
+        ylab='Average NF1 Knowledge Score',
         main="Pairwise Comparisons of NF1 Knowledge and Parental NF1 Status",
         font.lab = 2)
 legend(x = 3.0, y = 1, legend=c('Self-Affected','Other Parent Affected','Unaffected'), fill=legend_col, cex=0.75)
